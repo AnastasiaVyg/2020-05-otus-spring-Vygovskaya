@@ -37,7 +37,7 @@ public class QuestionDaoSimple implements QuestionDao {
     }
 
     private List<Question> readQuestions() throws URISyntaxException, IOException, CsvException {
-        Reader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource("questions.csv").toURI()));
+        Reader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource(questionsFileName).toURI()));
         CSVReader csvReader = new CSVReader(reader);
         List<Question> questions = csvReader.readAll().stream().map(line -> new Question(line[0], line[1])).collect(Collectors.toList());
         reader.close();
