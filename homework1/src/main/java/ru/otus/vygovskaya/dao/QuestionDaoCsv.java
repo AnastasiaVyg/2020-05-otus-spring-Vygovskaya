@@ -6,25 +6,16 @@ import com.opencsv.exceptions.CsvException;
 import org.springframework.core.io.ClassPathResource;
 import ru.otus.vygovskaya.domain.Question;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class QuestionDaoSimple implements QuestionDao {
+public class QuestionDaoCsv implements QuestionDao {
 
     private final String questionsFileName;
 
-    public QuestionDaoSimple(String questionsFileName) {
+    public QuestionDaoCsv(String questionsFileName) {
         this.questionsFileName = Preconditions.checkNotNull(questionsFileName);
     }
 
