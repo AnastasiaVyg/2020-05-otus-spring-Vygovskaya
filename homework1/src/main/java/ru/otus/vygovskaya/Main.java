@@ -1,24 +1,17 @@
 package ru.otus.vygovskaya;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import ru.otus.vygovskaya.domain.Question;
-import ru.otus.vygovskaya.service.QuestionService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import ru.otus.vygovskaya.service.ApplicationService;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-
+@ComponentScan
+@Configuration
 public class Main {
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring-context.xml");
-        QuestionService questionService = context.getBean(QuestionService.class);
-        questionService.getAllQuestions().stream().forEach(question -> System.out.println(question.toString()));
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+        ApplicationService applicationService = context.getBean(ApplicationService.class);
+        applicationService.testing();
         context.close();
     }
 

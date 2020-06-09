@@ -21,6 +21,9 @@ public class Question {
 
     @Override
     public String toString() {
-        return "Question: " + question + ", correct answer: " + correctAnswer;
+        return "Question#" + this.hashCode() + "{" +
+                "question='" + question + '\'' +
+                ", correctAnswer='" + correctAnswer + '\'' +
+                '}';
     }
 }

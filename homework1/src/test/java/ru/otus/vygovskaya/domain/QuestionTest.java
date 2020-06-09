@@ -1,23 +1,29 @@
 package ru.otus.vygovskaya.domain;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.otus.vygovskaya.utils.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.otus.vygovskaya.utils.TestUtils.*;
 
 class QuestionTest {
-    private static final String QUESTION_TEXT = "3*2";
-    private static final String ANSWER_TEXT = "6";
+
+    private Question question;
+
+    @BeforeEach
+    void setUp(){
+        question = new Question(QUESTION_TEXT_1, ANSWER_TEXT_1);
+    }
 
     @Test
     void getQuestion() {
-        Question question = new Question(QUESTION_TEXT, ANSWER_TEXT);
-        assertEquals(QUESTION_TEXT, question.getQuestion());
+        assertEquals(QUESTION_TEXT_1, question.getQuestion());
     }
 
     @Test
     void getCorrectAnswer() {
-        Question question = new Question(QUESTION_TEXT, ANSWER_TEXT);
-        assertEquals(ANSWER_TEXT, question.getCorrectAnswer());
+        assertEquals(ANSWER_TEXT_1, question.getCorrectAnswer());
     }
 
 }
