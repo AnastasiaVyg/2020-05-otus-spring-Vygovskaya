@@ -1,5 +1,6 @@
 package ru.otus.vygovskaya.utils;
 
+import ru.otus.vygovskaya.domain.Examination;
 import ru.otus.vygovskaya.domain.Question;
 import ru.otus.vygovskaya.domain.Student;
 
@@ -32,4 +33,5 @@ public class TestUtils {
     public static Student getStudent(){
         return new Student(NAME, SURNAME);
     }
+
 }
