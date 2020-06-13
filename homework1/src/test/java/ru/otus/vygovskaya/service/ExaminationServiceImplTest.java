@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.otus.vygovskaya.dao.ExaminationDao;
 import ru.otus.vygovskaya.domain.Examination;
 import ru.otus.vygovskaya.domain.Question;
 import ru.otus.vygovskaya.domain.Student;
@@ -18,9 +17,6 @@ import static ru.otus.vygovskaya.utils.TestUtils.*;
 class ExaminationServiceImplTest {
 
     @Mock
-    private ExaminationDao examinationDao;
-
-    @Mock
     private QuestionService questionService;
 
     private ExaminationService examinationService;
@@ -29,13 +25,12 @@ class ExaminationServiceImplTest {
 
     @BeforeEach
     void setUp(){
-        examinationService = new ExaminationServiceImpl(examinationDao, questionService, PASS_RATE);
+        examinationService = new ExaminationServiceImpl(questionService, PASS_RATE);
         student = new Student(NAME, SURNAME);
     }
 
     @Test
     void createExamination() {
-        given(examinationDao.createExamination(student, questions, PASS_RATE)).willReturn(getExamination());
         given(questionService.getAllQuestions()).willReturn(questions);
         Examination examination = examinationService.create(student);
         assertThat(examination.getStudent().getName()).isEqualTo(NAME);
