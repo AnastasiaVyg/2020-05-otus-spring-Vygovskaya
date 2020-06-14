@@ -1,0 +1,4 @@
+application:
+  pass-rate: 4
+  questions-basename: questions
+  locale: ru_RU

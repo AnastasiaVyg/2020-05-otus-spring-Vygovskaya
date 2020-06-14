@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.otus.vygovskaya.domain.Examination;
 import ru.otus.vygovskaya.domain.Question;
 import ru.otus.vygovskaya.domain.Student;
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static ru.otus.vygovskaya.utils.TestUtils.*;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class ExaminationServiceImplTest {
 
