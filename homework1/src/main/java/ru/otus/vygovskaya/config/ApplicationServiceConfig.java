@@ -1,12 +1,10 @@
 package ru.otus.vygovskaya.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.otus.vygovskaya.service.ApplicationService;
-import ru.otus.vygovskaya.service.ApplicationServiceImpl;
-import ru.otus.vygovskaya.service.ExaminationService;
-import ru.otus.vygovskaya.service.StudentService;
+import ru.otus.vygovskaya.service.*;
 
 import java.util.Scanner;
 
@@ -15,7 +13,8 @@ public class ApplicationServiceConfig {
 
     @Bean
     @Autowired
-    public ApplicationService applicationService(ExaminationService examinationService, StudentService studentService){
-        return new ApplicationServiceImpl(examinationService, studentService, new Scanner(System.in), System.out);
+    public ApplicationService applicationService(ExaminationService examinationService, StudentService studentService,
+                                                 ApplicationProperties properties, MessageSource messageSource, ScannerService scannerService){
+        return new ApplicationServiceImpl(examinationService, studentService, properties, messageSource, scannerService, System.out);
     }
 }
