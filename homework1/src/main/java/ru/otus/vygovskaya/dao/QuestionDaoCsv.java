@@ -3,11 +3,10 @@ package ru.otus.vygovskaya.dao;
 import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import org.springframework.core.io.ClassPathResource;
 import ru.otus.vygovskaya.domain.Question;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,13 +14,18 @@ public class QuestionDaoCsv implements QuestionDao {
 
     private final Reader reader;
 
+    private List<Question> questions;
+
     public QuestionDaoCsv(Reader reader) {
         this.reader = Preconditions.checkNotNull(reader);
     }
 
     @Override
     public List<Question> getAllQuestions() {
-        return readQuestions();
+        if (questions == null){
+            questions = readQuestions();
+        }
+        return questions;
     }
 
     private List<Question> readQuestions()  {

@@ -1,29 +1,26 @@
 package ru.otus.vygovskaya.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.vygovskaya.domain.Student;
 
-import static org.mockito.BDDMockito.given;
-import static ru.otus.vygovskaya.utils.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.vygovskaya.utils.TestUtils.NAME;
+import static ru.otus.vygovskaya.utils.TestUtils.SURNAME;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
+@DisplayName("Сервис студентов должен")
+@ActiveProfiles("test")
 class StudentServiceImplTest {
 
+    @Autowired
     private StudentService studentService;
 
-    @BeforeEach
-    void setUp(){
-        studentService = new StudentServiceImpl();
-    }
-
     @Test
+    @DisplayName("создавать студента")
     void create() {
         Student student = studentService.create(NAME, SURNAME);
         assertThat(student.getName()).isEqualTo(NAME);

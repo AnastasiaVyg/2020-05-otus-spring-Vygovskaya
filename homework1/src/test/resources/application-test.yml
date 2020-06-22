@@ -1,0 +1,9 @@
+application:
+  pass-rate: 2
+  questions-basename: test
+  locale: en
+
+spring:
+  shell:
+    interactive:
+      enabled: false

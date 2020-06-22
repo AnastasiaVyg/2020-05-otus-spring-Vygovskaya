@@ -1,11 +1,11 @@
 package ru.otus.vygovskaya.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.vygovskaya.dao.QuestionDao;
 import ru.otus.vygovskaya.domain.Question;
 import ru.otus.vygovskaya.utils.TestUtils;
@@ -15,20 +15,18 @@ import static org.mockito.BDDMockito.given;
 import static ru.otus.vygovskaya.utils.TestUtils.*;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
+@DisplayName("Сервис вопросов должен")
+@ActiveProfiles("test")
 class QuestionServiceImplTest {
 
-    @Mock
+    @MockBean
     private QuestionDao questionDao;
 
+    @Autowired
     private QuestionService questionService;
 
-    @BeforeEach
-    void setUp(){
-        questionService = new QuestionServiceImpl(questionDao);
-    }
-
     @Test
+    @DisplayName("возвращать все вопросы")
     void getAllQuestions() {
         given(questionDao.getAllQuestions()).willReturn(TestUtils.getQuestions());
         assertThat(questionService.getAllQuestions())

@@ -1,5 +1,8 @@
 package ru.otus.vygovskaya.service;
 
-public interface ScannerService {
+public interface IoService {
+
     String nextLine();
+
+    void println(String text);
 }

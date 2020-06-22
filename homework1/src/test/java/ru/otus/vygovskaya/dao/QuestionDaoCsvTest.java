@@ -1,7 +1,10 @@
 package ru.otus.vygovskaya.dao;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.vygovskaya.domain.Question;
 
 import java.io.ByteArrayInputStream;
@@ -10,6 +13,9 @@ import java.io.InputStreamReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Дао для работы с вопросами ")
+@SpringBootTest
+@ActiveProfiles("test")
 class QuestionDaoCsvTest {
 
     private QuestionDao questionDao;
@@ -21,6 +27,7 @@ class QuestionDaoCsvTest {
     }
 
     @Test
+    @DisplayName("должен возвращать непустой список вопросов")
     void getAllQuestions() {
         assertThat(questionDao.getAllQuestions())
                 .isNotEmpty()
