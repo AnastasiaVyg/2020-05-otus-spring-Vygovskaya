@@ -1,13 +1,14 @@
 package ru.otus.vygovskaya.service;
 
+import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
 import ru.otus.vygovskaya.config.ApplicationProperties;
 import ru.otus.vygovskaya.domain.Examination;
 import ru.otus.vygovskaya.domain.Student;
 
-import java.io.PrintStream;
-import java.util.Scanner;
-
+@Service
 public class ApplicationServiceImpl implements ApplicationService{
 
     private final ExaminationService examinationService;
@@ -18,40 +19,43 @@ public class ApplicationServiceImpl implements ApplicationService{
 
     private final MessageSource messageSource;
 
-    private final ScannerService scannerService;
+    private final IoService ioService;
 
-    private final PrintStream output;
+    private Student student;
 
+    private Examination examination;
+
+    @Autowired
     public ApplicationServiceImpl(ExaminationService examinationService, StudentService studentService, ApplicationProperties properties,
-                                  MessageSource messageSource, ScannerService scannerService, PrintStream output){
+                                  MessageSource messageSource, IoService ioService){
         this.examinationService = examinationService;
         this.studentService = studentService;
         this.properties = properties;
         this.messageSource = messageSource;
-        this.scannerService = scannerService;
-        this.output = output;
+        this.ioService = ioService;
+    }
+
+    @Override
+    public Student login(String surname, String name) {
+        Preconditions.checkNotNull(surname, "Not null surname");
+        Preconditions.checkNotNull(name, "not null name");
+        student = studentService.create(name, surname);
+        return student;
     }
 
     @Override
     public void testing() {
-        output.print(messageSource.getMessage("input.surname", null, properties.getLocale()));
-        String surname = scannerService.nextLine();
-        output.print(messageSource.getMessage("input.name", null, properties.getLocale()));
-        String name = scannerService.nextLine();
-
-        Student student = studentService.create(name, surname);
-
-        Examination examination = examinationService.create(student);
+        examination = examinationService.create(student);
         examination.getQuestions().stream().forEach(question -> {
-            output.println(question.getQuestion());
-            String answer = scannerService.nextLine();
+            ioService.println(question.getQuestion());
+            String answer = ioService.nextLine();
             examination.addAnswerToMap(question, answer);
         });
 
         if (examination.checkTest()){
-            output.println(messageSource.getMessage("pass.test", getStudentInfo(examination.getStudent()), properties.getLocale()));
+            ioService.println(messageSource.getMessage("pass.test", getStudentInfo(examination.getStudent()), properties.getLocale()));
         } else {
-            output.println(messageSource.getMessage("not.pass.test", getStudentInfo(examination.getStudent()), properties.getLocale()));
+            ioService.println(messageSource.getMessage("not.pass.test", getStudentInfo(examination.getStudent()), properties.getLocale()));
         }
 
     }
