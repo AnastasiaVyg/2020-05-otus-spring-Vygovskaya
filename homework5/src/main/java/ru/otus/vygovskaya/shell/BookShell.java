@@ -70,6 +70,28 @@ public class BookShell {
         }
     }
 
+    @ShellMethod(key = {"getAllBookByAuthor", "gABA"}, value = "get all Books by author command")
+    public String getAllBookByAuthor(@ShellOption(defaultValue = "6") long id){
+        try {
+            StringBuilder sb = new StringBuilder();
+            bookService.getAllByAuthorId(id).stream().forEach(book -> sb.append(getBookInfo(book)).append("\n"));
+            return sb.toString();
+        } catch (DataAccessException e){
+            return "don't get all Books by Author with id - " + id;
+        }
+    }
+
+    @ShellMethod(key = {"getAllBookByGenre", "gABG"}, value = "get all Books by genre command")
+    public String getAllBookByGenre(@ShellOption(defaultValue = "3") long id){
+        try {
+            StringBuilder sb = new StringBuilder();
+            bookService.getAllByGenreId(id).stream().forEach(book -> sb.append(getBookInfo(book)).append("\n"));
+            return sb.toString();
+        } catch (DataAccessException e){
+            return "don't get all Books by Genre with id - " + id;
+        }
+    }
+
     private static String getBookInfo(Book book){
         StringBuilder sb = new StringBuilder();
         sb.append("Book: id - ").append(book.getId()).append(", name - ").append(book.getName()).append(", author - ")

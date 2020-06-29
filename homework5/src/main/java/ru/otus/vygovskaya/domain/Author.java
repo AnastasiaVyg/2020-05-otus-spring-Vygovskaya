@@ -5,8 +5,8 @@ import java.util.Objects;
 public class Author {
 
     private long id;
-    private final String name;
-    private final String surname;
+    private String name;
+    private String surname;
 
     public Author(long id, String name, String surname){
         this(name, surname);
@@ -46,5 +46,13 @@ public class Author {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getSurname());
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }

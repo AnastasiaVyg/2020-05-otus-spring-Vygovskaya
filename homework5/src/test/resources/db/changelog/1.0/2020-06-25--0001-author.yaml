@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2020-06-25--0001-author
+      author: avygovskaya
+      changes:
+        - createTable:
+          - tableName: authors
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_author
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: authors
+            constraintName: unique_authors
+            columnNames: name, surname

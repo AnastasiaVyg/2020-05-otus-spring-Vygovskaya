@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2020-06-25--0001-test-data-genre
+      author: avygovskaya
+      context: test
+      runOnChange: true
+      loadUpdateData:
+        primaryKey: id
+        file: data/2020-06-25--0001-genre.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        seperator: ';'
+        encoding: UTF-8
+        tableName: genres
+
+  - changeSet:
+      id: 2020-06-25--0001-test-data-author
+      author: avygovskaya
+      context: test
+      runOnChange: true
+      loadUpdateData:
+        primaryKey: id
+        file: data/2020-06-25--0002-author.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        seperator: ';'
+        encoding: UTF-8
+        tableName: authors
+
+  - changeSet:
+      id: 2020-06-25--0001-test-data-book
+      author: avygovskaya
+      context: test
+      runOnChange: true
+      loadUpdateData:
+        primaryKey: id
+        file: data/2020-06-25--0003-book.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        seperator: ';'
+        encoding: UTF-8
+        tableName: books

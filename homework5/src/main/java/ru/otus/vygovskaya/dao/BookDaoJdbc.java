@@ -76,6 +76,22 @@ public class BookDaoJdbc implements BookDao{
                 "  where id = :id", params);
     }
 
+    @Override
+    public List<Book> getAllByAuthorId(long id) {
+        Map<String, Object> params = Collections.singletonMap("id", id);
+        return jdbcOperations.query("select b.id, b.name, b.year, a.id author_id, a.name author_name, a.surname author_surname, " +
+                "g.id genre_id, g.name genre_name from (books b inner join authors a on a.id = b.author_id) " +
+                " inner join genres g on g.id = b.genre_id where b.author_id = :id", params, new BookMapper());
+    }
+
+    @Override
+    public List<Book> getAllByGenreId(long id) {
+        Map<String, Object> params = Collections.singletonMap("id", id);
+        return jdbcOperations.query("select b.id, b.name, b.year, a.id author_id, a.name author_name, a.surname author_surname, " +
+                "g.id genre_id, g.name genre_name from (books b inner join authors a on a.id = b.author_id) " +
+                " inner join genres g on g.id = b.genre_id where b.genre_id = :id", params, new BookMapper());
+    }
+
     private static class BookMapper implements RowMapper<Book> {
 
         @Override

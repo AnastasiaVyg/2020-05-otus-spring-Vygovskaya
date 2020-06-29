@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Genre {
     private long id;
-    private final String name;
+    private String name;
 
     public Genre(long id, String name) {
         this.id = id;
@@ -38,5 +38,9 @@ public class Genre {
     @Override
     public int hashCode() {
         return Objects.hash(getName());
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

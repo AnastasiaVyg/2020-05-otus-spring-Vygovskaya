@@ -49,4 +49,14 @@ public class BookServiceImpl implements BookService{
     public int update(long id, String name, long authorId, long genreId, int year) {
         return bookDao.update(id, name, authorId, genreId, year);
     }
+
+    @Override
+    public List<Book> getAllByAuthorId(long id) {
+        return bookDao.getAllByAuthorId(id);
+    }
+
+    @Override
+    public List<Book> getAllByGenreId(long id) {
+        return bookDao.getAllByGenreId(id);
+    }
 }

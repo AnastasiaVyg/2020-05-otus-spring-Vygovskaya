@@ -6,13 +6,13 @@ public class Book {
 
     private long id;
 
-    private final String name;
+    private String name;
 
-    private final Author author;
+    private Author author;
 
-    private final Genre genre;
+    private Genre genre;
 
-    private final int year;
+    private int year;
 
     public Book(String name, Author author, Genre genre, int year) {
         this.name = name;
@@ -63,5 +63,21 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getAuthor(), getGenre());
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 }
