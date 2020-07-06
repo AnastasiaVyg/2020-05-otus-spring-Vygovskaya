@@ -2,10 +2,12 @@ package ru.otus.vygovskaya.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.vygovskaya.dao.GenreDao;
 import ru.otus.vygovskaya.domain.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenreServiceImpl implements GenreService{
@@ -22,25 +24,28 @@ public class GenreServiceImpl implements GenreService{
         return genreDao.getAll();
     }
 
+    @Transactional
     @Override
-    public Genre create(String name) {
+    public Genre save(String name) {
         Genre genre = new Genre(name);
-        genreDao.create(genre);
+        genreDao.save(genre);
         return genre;
     }
 
     @Override
-    public Genre getById(long id) {
+    public Optional<Genre> getById(long id) {
         return genreDao.getById(id);
     }
 
+    @Transactional
     @Override
     public int deleteById(long id) {
         return genreDao.deleteById(id);
     }
 
+    @Transactional
     @Override
     public int update(long id, String name) {
-        return genreDao.update(new Genre(id, name));
+        return genreDao.update(id, name);
     }
 }

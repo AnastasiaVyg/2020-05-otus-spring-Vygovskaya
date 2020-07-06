@@ -1,12 +1,24 @@
 package ru.otus.vygovskaya.domain;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "authors")
 public class Author {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "surname")
     private String surname;
+
+    public Author() {
+    }
 
     public Author(long id, String name, String surname){
         this(name, surname);

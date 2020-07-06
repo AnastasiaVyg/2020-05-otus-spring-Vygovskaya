@@ -1,10 +1,21 @@
 package ru.otus.vygovskaya.domain;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "genres")
 public class Genre {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name")
     private String name;
+
+    public Genre() {
+    }
 
     public Genre(long id, String name) {
         this.id = id;

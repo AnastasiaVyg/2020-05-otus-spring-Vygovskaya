@@ -11,8 +11,5 @@ public class Main {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class);
-        AuthorDao authorDao = context.getBean(AuthorDao.class);
-        authorDao.getAll().stream().forEach(author -> System.out.println(author.getName() + " " + author.getSurname()));
-        System.out.println("create id=" + authorDao.create(new Author("Александр", "П")));
     }
 }

@@ -4,11 +4,12 @@ import org.springframework.dao.DataAccessException;
 import ru.otus.vygovskaya.domain.Author;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AuthorDao {
     List<Author> getAll();
-    int create(Author author);
-    Author getById(long id);
+    Author save(Author author);
+    Optional<Author> getById(long id);
     int deleteById(long id);
-    int update(Author author);
+    int update(long id, String name, String surname);
 }

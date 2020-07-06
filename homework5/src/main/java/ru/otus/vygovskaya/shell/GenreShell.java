@@ -7,6 +7,8 @@ import org.springframework.shell.standard.ShellOption;
 import ru.otus.vygovskaya.domain.Genre;
 import ru.otus.vygovskaya.service.GenreService;
 
+import java.util.Optional;
+
 @ShellComponent
 public class GenreShell {
 
@@ -19,7 +21,7 @@ public class GenreShell {
     @ShellMethod(key = {"createGenre", "cG"}, value = "create Genre command")
     public String createGenre(@ShellOption(defaultValue = "documental") String name){
         try {
-            Genre genre = genreService.create(name);
+            Genre genre = genreService.save(name);
             return "create new " + getGenreInfo(genre.getId(), genre.getName());
         } catch (DataAccessException e){
             return "don't create Genre with name - " + name;
@@ -27,22 +29,22 @@ public class GenreShell {
     }
 
     @ShellMethod(key = {"getGenre", "gG"}, value = "get Genre command")
-    public String getGenre(@ShellOption(defaultValue = "1") long id){
+    public Optional<String> getGenre(@ShellOption(defaultValue = "1") long id){
         try {
-            Genre genre = genreService.getById(id);
-            return getGenreInfo(genre.getId(), genre.getName());
+            Optional<Genre> genre = genreService.getById(id);
+            return getGenreInfo(genre);
         } catch (DataAccessException e){
-            return "don't get Genre with id " + id;
+            return Optional.empty();
         }
     }
 
     @ShellMethod(key = {"deleteGenre", "dG"}, value = "delete Genre command")
     public String deleteGenre(@ShellOption(defaultValue = "5") long id){
         try {
-            genreService.deleteById(id);
-            return "delete Genre with id " + id;
+            int result = genreService.deleteById(id);
+            return (result == 1) ? "delete Genre with id " + id : "don't delete Genre with id " + id;
         } catch (DataAccessException e){
-            return "don't delete Genre with id " + id;
+            return "don't delete Genre with id " + id + e.toString();
         }
     }
 
@@ -71,5 +73,9 @@ public class GenreShell {
         StringBuilder sb = new StringBuilder();
         sb.append("Genre: id - ").append(id).append(", name - ").append(name);
         return sb.toString();
+    }
+
+    private static Optional<String> getGenreInfo(Optional<Genre> optionalGenre){
+        return optionalGenre.map(genre -> getGenreInfo(genre.getId(), genre.getName()));
     }
 }
