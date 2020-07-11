@@ -3,8 +3,8 @@ package ru.otus.vygovskaya.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.vygovskaya.dao.GenreDao;
 import ru.otus.vygovskaya.domain.Genre;
+import ru.otus.vygovskaya.repository.GenreRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,35 +12,35 @@ import java.util.Optional;
 @Service
 public class GenreServiceImpl implements GenreService{
 
-    private final GenreDao genreDao;
+    private final GenreRepository genreRepository;
 
     @Autowired
-    public GenreServiceImpl(GenreDao genreDao) {
-        this.genreDao = genreDao;
+    public GenreServiceImpl(GenreRepository genreRepository) {
+        this.genreRepository = genreRepository;
     }
 
     @Override
     public List<Genre> getAll() {
-        return genreDao.getAll();
+        return genreRepository.findAll();
     }
 
     @Transactional
     @Override
     public Genre save(String name) {
         Genre genre = new Genre(name);
-        genreDao.save(genre);
+        genreRepository.save(genre);
         return genre;
     }
 
     @Override
     public Optional<Genre> getById(long id) {
-        return genreDao.getById(id);
+        return genreRepository.findById(id);
     }
 
     @Transactional
     @Override
     public void deleteById(long id) {
-        genreDao.deleteById(id);
+        genreRepository.deleteById(id);
     }
 
     @Transactional
@@ -50,7 +50,7 @@ public class GenreServiceImpl implements GenreService{
         if (optionalGenre.isPresent()){
             Genre genre = optionalGenre.get();
             genre.setName(name);
-            genreDao.save(genre);
+            genreRepository.save(genre);
             return true;
         } else {
             return false;
