@@ -19,27 +19,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с комментариями")
 @DataJpaTest
-@Import({CommentDaoJpa.class})
+@Import({CommentDaoJpa.class, BookDaoJpa.class})
 class CommentDaoJpaTest {
 
     private static final long FIRST_COMMENT_ID = 1L;
+    private static final long BOOK_ID = 2L;
 
     private static final String COMMENT_1 = "It is a beautiful";
     private static final String COMMENT_2 = "Super";
     private static final String COMMENT_3 = "don't like";
 
-    private static final long BOOK_ID = 2L;
-
     private static final int EXPECTED_NUMBER_OF_COMMENTS = 2;
-
-    private static final String BOOK_NAME = "The Golden Cockerel";
-    private static final int YEAR = 2000;
-    private static final String AUTHOR_NAME = "Boris";
-    private static final String AUTHOR_SURNAME = "Akunin";
-    private static final String GENRE = "documental";
 
     @Autowired
     private CommentDaoJpa commentDaoJpa;
+
+    @Autowired
+    private BookDaoJpa bookDaoJpa;
 
     @Autowired
     private TestEntityManager em;
@@ -57,11 +53,10 @@ class CommentDaoJpaTest {
     @DisplayName("должен создавать комментарий в БД, а потом возвращать его")
     @Test
     void save() {
-        Author author = new Author(0, AUTHOR_NAME, AUTHOR_SURNAME);
-        Genre genre = new Genre(0, GENRE);
-        Book book = new Book(0, BOOK_NAME, author, genre, YEAR);
+        Optional<Book> optionalBook = bookDaoJpa.getById(BOOK_ID);
+        assertThat(optionalBook).isPresent();
 
-        Comment comment = new Comment(0, COMMENT_3, book);
+        Comment comment = new Comment(0, COMMENT_3, optionalBook.get());
         commentDaoJpa.save(comment);
         assertThat(comment.getId()).isGreaterThan(0);
         Comment expectedComment = em.find(Comment.class, comment.getId());
@@ -98,7 +93,10 @@ class CommentDaoJpaTest {
         String oldText = comment.getText();
         em.detach(comment);
 
-        commentDaoJpa.update(FIRST_COMMENT_ID, newText);
+        Optional<Comment> commentDaoJpaById = commentDaoJpa.getById(FIRST_COMMENT_ID);
+        assertThat(commentDaoJpaById).isPresent();
+        commentDaoJpaById.get().setText(newText);
+        commentDaoJpa.save(commentDaoJpaById.get());
         Comment updatedComment = em.find(Comment.class, FIRST_COMMENT_ID);
 
         assertThat(updatedComment.getText()).isNotEqualTo(oldText).isEqualTo(newText);

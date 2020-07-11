@@ -44,13 +44,21 @@ public class CommentServiceImpl implements CommentService{
 
     @Transactional
     @Override
-    public int deleteById(long id) {
-        return commentDao.deleteById(id);
+    public void deleteById(long id) {
+        commentDao.deleteById(id);
     }
 
     @Transactional
     @Override
-    public int updateTextById(long id, String text) {
-        return commentDao.update(id, text);
+    public boolean updateTextById(long id, String text) {
+        Optional<Comment> optionalComment = getById(id);
+        if (optionalComment.isPresent()){
+            Comment comment = optionalComment.get();
+            comment.setText(text);
+            commentDao.save(comment);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

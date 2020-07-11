@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Comment;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с книгами")
 @DataJpaTest
-@Import({BookDaoJpa.class})
+@Import({BookDaoJpa.class, AuthorDaoJpa.class, GenreDaoJpa.class, CommentDaoJpa.class})
 class BookDaoJpaTest {
 
     private static final String BOOK_NAME_1 = "Ruslan and Ludmila";
@@ -31,18 +32,14 @@ class BookDaoJpaTest {
     private static final int YEAR_1 = 1820;
     private static final int YEAR_2 = 1835;
     private static final int YEAR_3 = 1837;
-    private static final int YEAR_4 = 1834;
 
     private static final String AUTHOR_NAME_1 = "Alexander";
     private static final String AUTHOR_SURNAME_1 = "Pushkin";
     private static final String AUTHOR_NAME_2 = "Mikhail";
     private static final String AUTHOR_SURNAME_2 = "Lermontov";
-    private static final String AUTHOR_NAME_3 = "Boris";
-    private static final String AUTHOR_SURNAME_3 = "Akunin";
 
     private static final String GENRE_1 = "story";
     private static final String GENRE_2 = "poem";
-    private static final String GENRE_3 = "documental";
 
     private static final int EXPECTED_NUMBER_OF_BOOKS = 3;
 
@@ -50,6 +47,15 @@ class BookDaoJpaTest {
 
     @Autowired
     private BookDaoJpa bookDaoJpa;
+
+    @Autowired
+    private AuthorDaoJpa authorDaoJpa;
+
+    @Autowired
+    private GenreDaoJpa genreDaoJpa;
+
+    @Autowired
+    private CommentDaoJpa commentDaoJpa;
 
     @Autowired
     private TestEntityManager em;
@@ -74,21 +80,27 @@ class BookDaoJpaTest {
     @DisplayName("должен создавать книгу в БД, а потом возвращать ее")
     @Test
     void save() {
-        Author author = new Author(0,AUTHOR_NAME_3, AUTHOR_SURNAME_3);
-        Genre genre = new Genre(0, GENRE_3);
-        Book book = new Book(0, BOOK_NAME_4, author, genre, 2000);
-        Comment comment = new Comment(0, "The great book", book);
-        List<Comment> comments = Collections.singletonList(comment);
-        book.setComments(comments);
+        Optional<Author> optionalAuthor = authorDaoJpa.getById(1);
+        assertThat(optionalAuthor).isPresent();
 
-        bookDaoJpa.save(book);
+        Optional<Genre> optionalGenre = genreDaoJpa.getById(1);
+        assertThat(optionalGenre).isPresent();
+
+        Book book = bookDaoJpa.save(new Book(0, BOOK_NAME_4, optionalAuthor.get(), optionalGenre.get(), YEAR_3));
+
+        Comment cmt = new Comment(0, "The great book", book);
+        Comment comment = commentDaoJpa.save(cmt);
+        List<Comment> comments = book.getComments();
+        comments.add(comment);
+        em.detach(book);
+
         assertThat(book.getId()).isGreaterThan(0);
         Book expectedBook = em.find(Book.class, book.getId());
 
         assertThat(expectedBook).isNotNull().matches(b -> b.getName().equals(BOOK_NAME_4))
-                .matches(b -> b.getAuthor() != null && b.getAuthor().getName().equals(AUTHOR_NAME_3) && b.getAuthor().getSurname().equals(AUTHOR_SURNAME_3)
+                .matches(b -> b.getAuthor() != null && b.getAuthor().getName().equals(AUTHOR_NAME_1) && b.getAuthor().getSurname().equals(AUTHOR_SURNAME_1)
                         && b.getAuthor().getId() > 0)
-                .matches(b -> b.getGenre() != null && b.getGenre().getName().equals(GENRE_3) && b.getGenre().getId() > 0)
+                .matches(b -> b.getGenre() != null && b.getGenre().getName().equals(GENRE_1) && b.getGenre().getId() > 0)
                 .matches(b -> b.getComments() != null && b.getComments().size() > 0);
     }
 
@@ -122,7 +134,11 @@ class BookDaoJpaTest {
         String oldName = book.getName();
         em.detach(book);
 
-        bookDaoJpa.updateNameById(FIRST_BOOK_ID, newName);
+        Optional<Book> bookDaoJpaById = bookDaoJpa.getById(FIRST_BOOK_ID);
+        assertThat(bookDaoJpaById).isPresent();
+        bookDaoJpaById.get().setName(newName);
+        bookDaoJpa.save(bookDaoJpaById.get());
+
         Book updatedBook = em.find(Book.class, FIRST_BOOK_ID);
 
         assertThat(updatedBook.getName()).isNotEqualTo(oldName).isEqualTo(newName);

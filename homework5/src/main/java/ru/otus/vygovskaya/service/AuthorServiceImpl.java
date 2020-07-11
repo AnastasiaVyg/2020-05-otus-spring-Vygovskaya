@@ -39,13 +39,22 @@ public class AuthorServiceImpl implements AuthorService{
 
     @Transactional
     @Override
-    public int deleteById(long id) {
-        return authorDao.deleteById(id);
+    public void deleteById(long id) {
+        authorDao.deleteById(id);
     }
 
     @Transactional
     @Override
-    public int update(long id, String name, String surname) {
-        return authorDao.update(id, name, surname);
+    public boolean update(long id, String name, String surname) {
+        Optional<Author> optionalAuthor = getById(id);
+        if (optionalAuthor.isPresent()){
+            Author author = optionalAuthor.get();
+            author.setName(name);
+            author.setSurname(surname);
+            authorDao.save(author);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

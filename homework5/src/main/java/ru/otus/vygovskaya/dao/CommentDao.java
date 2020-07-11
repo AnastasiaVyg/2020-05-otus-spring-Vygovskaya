@@ -1,6 +1,5 @@
 package ru.otus.vygovskaya.dao;
 
-import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Comment;
 
 import java.util.List;
@@ -10,6 +9,5 @@ public interface CommentDao {
     List<Comment> getAll();
     Comment save(Comment comment);
     Optional<Comment> getById(long id);
-    int deleteById(long id);
-    int update(long id, String text);
+    void deleteById(long id);
 }

@@ -9,6 +9,6 @@ public interface AuthorService {
     List<Author> getAll();
     Author save(String name, String surname);
     Optional<Author> getById(long id);
-    int deleteById(long id);
-    int update(long id, String name, String surname);
+    void deleteById(long id);
+    boolean update(long id, String name, String surname);
 }

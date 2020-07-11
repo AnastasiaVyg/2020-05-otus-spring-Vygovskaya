@@ -41,18 +41,18 @@ public class AuthorShell {
     @ShellMethod(key = {"deleteAuthor", "dA"}, value = "delete Author command")
     public String deleteAuthor(@ShellOption(defaultValue = "5") long id){
         try {
-            int result = authorService.deleteById(id);
-            return (result == 1) ? "delete Author with id " + id : "don't delete Author with id " + id;
+            authorService.deleteById(id);
+            return "delete Author with id " + id;
         } catch (DataAccessException e){
-            return "don't delete Author with id " + id;
+            return "don't delete Author with id " + id +e.toString();
         }
     }
 
     @ShellMethod(key = {"updateAuthor", "uA"}, value = "update Author command")
     public String updateAuthor(@ShellOption(defaultValue = "8") long id, @ShellOption(defaultValue = "J") String name, @ShellOption(defaultValue = "Aust") String surname){
         try {
-            int result = authorService.update(id, name, surname);
-            return result == 1 ? "update " + getAuthorInfo(id, name, surname) : "don't update " + getAuthorInfo(id, name, surname);
+            boolean result = authorService.update(id, name, surname);
+            return result ? "update " + getAuthorInfo(id, name, surname) : "don't update " + getAuthorInfo(id, name, surname);
         } catch (DataAccessException e){
             return "don't update " + getAuthorInfo(id, name, surname);
         }

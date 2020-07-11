@@ -90,7 +90,10 @@ class GenreDaoJpaTest {
         String oldName = genre.getName();
         em.detach(genre);
 
-        genreDaoJpa.update(FIRST_GENRE_ID, newName);
+        Optional<Genre> genreDaoJpaById = genreDaoJpa.getById(FIRST_GENRE_ID);
+        assertThat(genreDaoJpaById).isPresent();
+        genreDaoJpaById.get().setName(newName);
+        genreDaoJpa.save(genreDaoJpaById.get());
         Genre updatedGenre = em.find(Genre.class, FIRST_GENRE_ID);
 
         assertThat(updatedGenre.getName()).isNotEqualTo(oldName).isEqualTo(newName);

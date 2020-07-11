@@ -9,6 +9,6 @@ public interface GenreService {
     List<Genre> getAll();
     Genre save(String name);
     Optional<Genre> getById(long id);
-    int deleteById(long id);
-    int update(long id, String name);
+    void deleteById(long id);
+    boolean update(long id, String name);
 }

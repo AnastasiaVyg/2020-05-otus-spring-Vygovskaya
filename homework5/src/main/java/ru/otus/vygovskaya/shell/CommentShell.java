@@ -42,8 +42,8 @@ public class CommentShell {
     @ShellMethod(key = {"deleteComment", "dC"}, value = "delete Comment command")
     public String deleteComment(@ShellOption(defaultValue = "3") long id){
         try {
-            int result = commentService.deleteById(id);
-            return (result == 1) ? "delete Comment with id " + id : "don't delete Comment with id " + id;
+            commentService.deleteById(id);
+            return "delete Comment with id " + id;
         } catch (DataAccessException e){
             return "don't delete Comment with id " + id + e.toString();
         }
@@ -52,8 +52,8 @@ public class CommentShell {
     @ShellMethod(key = {"updateComment", "uC"}, value = "update Comment command")
     public String updateComment(@ShellOption(defaultValue = "1") long id, @ShellOption(defaultValue = "bad") String text){
         try {
-            int update = commentService.updateTextById(id, text);
-            return update == 1 ? "update Comment with id - " + id : "don't update Comment with id - " + id;
+            boolean update = commentService.updateTextById(id, text);
+            return update ? "update Comment with id - " + id : "don't update Comment with id - " + id;
         } catch (DataAccessException e){
             return "don't update Comment with id - " + id;
         }

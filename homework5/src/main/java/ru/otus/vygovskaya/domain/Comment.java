@@ -13,8 +13,8 @@ public class Comment {
     @Column(name = "text")
     private String text;
 
-    @OneToOne(targetEntity = Book.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "book_id")
+    @ManyToOne(targetEntity = Book.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     public Comment() {
@@ -53,5 +53,14 @@ public class Comment {
 
     public void setBook(Book book) {
         this.book = book;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", book=" + book +
+                '}';
     }
 }

@@ -89,7 +89,11 @@ class AuthorDaoJpaTest {
         String oldSurname = author.getSurname();
         em.detach(author);
 
-        authorDaoJpa.update(FIRST_AUTHOR_ID, newName, newSurname);
+        Optional<Author> authorDaoJpaById = authorDaoJpa.getById(FIRST_AUTHOR_ID);
+        assertThat(authorDaoJpaById).isPresent();
+        authorDaoJpaById.get().setName(newName);
+        authorDaoJpaById.get().setSurname(newSurname);
+        authorDaoJpa.save(authorDaoJpaById.get());
         Author updatedAuthor = em.find(Author.class, FIRST_AUTHOR_ID);
 
         assertThat(updatedAuthor.getName()).isNotEqualTo(oldName).isEqualTo(newName);

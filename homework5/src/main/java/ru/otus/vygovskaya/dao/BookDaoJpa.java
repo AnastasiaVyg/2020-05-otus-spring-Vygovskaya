@@ -1,7 +1,6 @@
 package ru.otus.vygovskaya.dao;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
@@ -19,14 +18,14 @@ public class BookDaoJpa implements BookDao{
     @Override
     public List<Book> getAll() {
         EntityGraph<?> entityGraph = em.getEntityGraph("books-authors-genre-entity-graph");
-        TypedQuery<Book> query = em.createQuery("select b from Book b left join fetch b.comments", Book.class);
+        TypedQuery<Book> query = em.createQuery("select b from Book b", Book.class);
         query.setHint("javax.persistence.fetchgraph", entityGraph);
         return query.getResultList();
     }
 
     @Override
     public Book save(Book book) {
-        if (book.getId() <= 0){
+        if (!em.contains(book)){
             em.persist(book);
             return book;
         } else {
@@ -36,22 +35,14 @@ public class BookDaoJpa implements BookDao{
 
     @Override
     public Optional<Book> getById(long id) {
-        return Optional.ofNullable(em.find(Book.class, id));
+         Optional<Book> optionalBook = Optional.ofNullable(em.find(Book.class, id));
+         return optionalBook;
     }
 
     @Override
-    public int deleteById(long id) {
-        Query query = em.createQuery("delete from Book b where b.id = :id");
-        query.setParameter("id", id);
-        return query.executeUpdate();
-    }
-
-    @Override
-    public int updateNameById(long id, String name) {
-        Query query = em.createQuery("update Book b set b.name = :name where b.id = :id");
-        query.setParameter("id", id);
-        query.setParameter("name", name);
-        return query.executeUpdate();
+    public void deleteById(long id) {
+        Optional<Book> optionalBook = getById(id);
+        optionalBook.ifPresent(book -> em.remove(book));
     }
 
     @Override

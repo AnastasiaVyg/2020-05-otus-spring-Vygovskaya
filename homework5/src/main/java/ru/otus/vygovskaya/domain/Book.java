@@ -1,6 +1,7 @@
 package ru.otus.vygovskaya.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,20 +19,19 @@ public class Book {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(targetEntity = Author.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = Author.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @OneToOne(targetEntity = Genre.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = Genre.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
     @Column(name = "year")
     private int year;
 
-    @OneToMany(targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "book_id")
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "book" , targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     public Book() {
     }
@@ -107,7 +107,7 @@ public class Book {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
+//    public void setComments(List<Comment> comments) {
+//        this.comments = comments;
+//    }
 }

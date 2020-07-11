@@ -11,8 +11,7 @@ public interface BookDao {
     List<Book> getAll();
     Book save(Book book);
     Optional<Book> getById(long id);
-    int deleteById(long id);
-    int updateNameById(long id, String name);
+    void deleteById(long id);
     List<Book> getAllByAuthorId(Author author);
     List<Book> getAllByGenreId(Genre genre);
 }

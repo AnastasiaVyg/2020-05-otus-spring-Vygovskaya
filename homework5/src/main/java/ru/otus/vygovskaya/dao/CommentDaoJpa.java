@@ -5,7 +5,6 @@ import ru.otus.vygovskaya.domain.Comment;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
@@ -38,18 +37,9 @@ public class CommentDaoJpa implements CommentDao{
     }
 
     @Override
-    public int deleteById(long id) {
-        Query query = em.createQuery("delete from Comment c where c.id = :id");
-        query.setParameter("id", id);
-        return query.executeUpdate();
-    }
-
-    @Override
-    public int update(long id, String text) {
-        Query query = em.createQuery("update Comment c set c.text = :text where c.id = :id");
-        query.setParameter("id", id);
-        query.setParameter("text", text);
-        return query.executeUpdate();
+    public void deleteById(long id) {
+        Optional<Comment> optionalComment = getById(id);
+        optionalComment.ifPresent(comment -> em.remove(comment));
     }
 
 }

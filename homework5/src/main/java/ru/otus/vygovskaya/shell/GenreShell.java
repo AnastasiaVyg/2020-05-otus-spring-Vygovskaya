@@ -41,8 +41,8 @@ public class GenreShell {
     @ShellMethod(key = {"deleteGenre", "dG"}, value = "delete Genre command")
     public String deleteGenre(@ShellOption(defaultValue = "5") long id){
         try {
-            int result = genreService.deleteById(id);
-            return (result == 1) ? "delete Genre with id " + id : "don't delete Genre with id " + id;
+            genreService.deleteById(id);
+            return "delete Genre with id " + id;
         } catch (DataAccessException e){
             return "don't delete Genre with id " + id + e.toString();
         }
@@ -51,8 +51,8 @@ public class GenreShell {
     @ShellMethod(key = {"updateGenre", "uG"}, value = "update Genre command")
     public String updateGenre(@ShellOption(defaultValue = "1") long id, @ShellOption(defaultValue = "tale") String name){
         try {
-            int update = genreService.update(id, name);
-            return update == 1 ? "update " + getGenreInfo(id, name) : "don't update " + getGenreInfo(id, name);
+            boolean update = genreService.update(id, name);
+            return update ? "update " + getGenreInfo(id, name) : "don't update " + getGenreInfo(id, name);
         } catch (DataAccessException e){
             return "don't update " + getGenreInfo(id, name);
         }
