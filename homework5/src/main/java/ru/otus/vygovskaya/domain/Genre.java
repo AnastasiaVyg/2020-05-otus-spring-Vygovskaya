@@ -1,6 +1,8 @@
 package ru.otus.vygovskaya.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -13,6 +15,9 @@ public class Genre {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "genre" , targetEntity = Book.class, fetch = FetchType.LAZY)
+    private List<Book> books = new ArrayList<>();
 
     public Genre() {
     }
@@ -53,5 +58,9 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Book> getBooks() {
+        return books;
     }
 }

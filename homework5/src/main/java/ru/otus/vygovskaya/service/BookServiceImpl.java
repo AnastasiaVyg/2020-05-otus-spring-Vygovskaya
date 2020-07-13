@@ -11,6 +11,7 @@ import ru.otus.vygovskaya.repository.AuthorRepository;
 import ru.otus.vygovskaya.repository.BookRepository;
 import ru.otus.vygovskaya.repository.GenreRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,16 +76,18 @@ public class BookServiceImpl implements BookService{
         }
     }
 
+    @Transactional
     @Override
     public List<BookDto> getAllByAuthorId(long id) {
         Author author = authorRepository.findById(id).orElseThrow();
-        return bookRepository.findAllByAuthor(author).stream().map(book -> createBookDto(book)).collect(Collectors.toList());
+        return author.getBooks().stream().map(book -> createBookDto(book)).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public List<BookDto> getAllByGenreId(long id) {
         Genre genre = genreRepository.findById(id).orElseThrow();
-        return bookRepository.findAllByGenre(genre).stream().map(book -> createBookDto(book)).collect(Collectors.toList());
+        return genre.getBooks().stream().map(book -> createBookDto(book)).collect(Collectors.toList());
     }
 
     private BookDto createBookDto(Book book){

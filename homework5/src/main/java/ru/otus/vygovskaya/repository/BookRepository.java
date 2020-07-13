@@ -8,6 +8,4 @@ import ru.otus.vygovskaya.domain.Genre;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
-    List<Book> findAllByAuthor(Author author);
-    List<Book> findAllByGenre(Genre genre);
 }

@@ -1,6 +1,8 @@
 package ru.otus.vygovskaya.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,6 +18,9 @@ public class Author {
 
     @Column(name = "surname")
     private String surname;
+
+    @OneToMany(mappedBy = "author" , targetEntity = Book.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Book> books = new ArrayList<>();
 
     public Author() {
     }
@@ -66,5 +71,9 @@ public class Author {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public List<Book> getBooks() {
+        return books;
     }
 }
