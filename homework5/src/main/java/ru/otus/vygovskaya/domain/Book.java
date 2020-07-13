@@ -1,18 +1,40 @@
 package ru.otus.vygovskaya.domain;
 
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "books")
+// Позволяет указать какие связи родительской сущности загружать в одном с ней запросе
+@NamedEntityGraph(name = "books-authors-genre-entity-graph",
+        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")})
 public class Book {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "name")
     private String name;
 
+    @OneToOne(targetEntity = Author.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @JoinColumn(name = "author_id")
     private Author author;
 
+    @OneToOne(targetEntity = Genre.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @JoinColumn(name = "genre_id")
     private Genre genre;
 
+    @Column(name = "year")
     private int year;
+
+    @OneToMany(mappedBy = "book" , targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    public Book() {
+    }
 
     public Book(String name, Author author, Genre genre, int year) {
         this.name = name;
@@ -80,4 +102,12 @@ public class Book {
     public void setYear(int year) {
         this.year = year;
     }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+//    public void setComments(List<Comment> comments) {
+//        this.comments = comments;
+//    }
 }

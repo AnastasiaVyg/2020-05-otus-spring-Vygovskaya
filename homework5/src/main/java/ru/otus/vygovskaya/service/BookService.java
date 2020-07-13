@@ -1,15 +1,16 @@
 package ru.otus.vygovskaya.service;
 
-import ru.otus.vygovskaya.domain.Book;
+import ru.otus.vygovskaya.dto.BookDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookService {
-    List<Book> getAll();
-    Book create(String name, long authorId, long genreId, int year);
-    Book getById(long id);
-    int deleteById(long id);
-    int update(long id, String name, long authorId, long genreId, int year);
-    List<Book> getAllByAuthorId(long id);
-    List<Book> getAllByGenreId(long id);
+    List<BookDto> getAll();
+    BookDto save(String name, long authorId, long genreId, int year);
+    Optional<BookDto> getById(long id);
+    void deleteById(long id);
+    boolean updateNameById(long id, String name);
+    List<BookDto> getAllByAuthorId(long id);
+    List<BookDto> getAllByGenreId(long id);
 }

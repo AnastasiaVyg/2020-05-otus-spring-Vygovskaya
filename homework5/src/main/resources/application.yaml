@@ -6,3 +6,10 @@ spring:
       enabled: true
   liquibase:
     enabled: true
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true

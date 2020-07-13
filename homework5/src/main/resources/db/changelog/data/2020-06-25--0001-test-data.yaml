@@ -43,3 +43,18 @@ databaseChangeLog:
         seperator: ';'
         encoding: UTF-8
         tableName: books
+
+  - changeSet:
+      id: 2020-07-05--0004-test-data-comment
+      author: avygovskaya
+      context: test
+      runOnChange: true
+      loadUpdateData:
+        primaryKey: id
+        file: data/2020-07-05--0004-comment.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        seperator: ';'
+        encoding: UTF-8
+        tableName: comments

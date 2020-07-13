@@ -2,10 +2,12 @@ package ru.otus.vygovskaya.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.vygovskaya.dao.AuthorDao;
 import ru.otus.vygovskaya.domain.Author;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorServiceImpl implements AuthorService{
@@ -22,25 +24,37 @@ public class AuthorServiceImpl implements AuthorService{
         return authorDao.getAll();
     }
 
+    @Transactional
     @Override
-    public Author create(String name, String surname) {
+    public Author save(String name, String surname) {
         Author author = new Author(name, surname);
-        authorDao.create(author);
+        authorDao.save(author);
         return author;
     }
 
     @Override
-    public Author getById(long id) {
+    public Optional<Author> getById(long id) {
         return authorDao.getById(id);
     }
 
+    @Transactional
     @Override
-    public int deleteById(long id) {
-        return authorDao.deleteById(id);
+    public void deleteById(long id) {
+        authorDao.deleteById(id);
     }
 
+    @Transactional
     @Override
-    public int update(long id, String name, String surname) {
-        return authorDao.update(new Author(id, name, surname));
+    public boolean update(long id, String name, String surname) {
+        Optional<Author> optionalAuthor = getById(id);
+        if (optionalAuthor.isPresent()){
+            Author author = optionalAuthor.get();
+            author.setName(name);
+            author.setSurname(surname);
+            authorDao.save(author);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

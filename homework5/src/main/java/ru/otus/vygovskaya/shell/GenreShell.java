@@ -7,6 +7,8 @@ import org.springframework.shell.standard.ShellOption;
 import ru.otus.vygovskaya.domain.Genre;
 import ru.otus.vygovskaya.service.GenreService;
 
+import java.util.Optional;
+
 @ShellComponent
 public class GenreShell {
 
@@ -19,7 +21,7 @@ public class GenreShell {
     @ShellMethod(key = {"createGenre", "cG"}, value = "create Genre command")
     public String createGenre(@ShellOption(defaultValue = "documental") String name){
         try {
-            Genre genre = genreService.create(name);
+            Genre genre = genreService.save(name);
             return "create new " + getGenreInfo(genre.getId(), genre.getName());
         } catch (DataAccessException e){
             return "don't create Genre with name - " + name;
@@ -27,12 +29,12 @@ public class GenreShell {
     }
 
     @ShellMethod(key = {"getGenre", "gG"}, value = "get Genre command")
-    public String getGenre(@ShellOption(defaultValue = "1") long id){
+    public Optional<String> getGenre(@ShellOption(defaultValue = "1") long id){
         try {
-            Genre genre = genreService.getById(id);
-            return getGenreInfo(genre.getId(), genre.getName());
+            Optional<Genre> genre = genreService.getById(id);
+            return getGenreInfo(genre);
         } catch (DataAccessException e){
-            return "don't get Genre with id " + id;
+            return Optional.empty();
         }
     }
 
@@ -42,15 +44,15 @@ public class GenreShell {
             genreService.deleteById(id);
             return "delete Genre with id " + id;
         } catch (DataAccessException e){
-            return "don't delete Genre with id " + id;
+            return "don't delete Genre with id " + id + e.toString();
         }
     }
 
     @ShellMethod(key = {"updateGenre", "uG"}, value = "update Genre command")
     public String updateGenre(@ShellOption(defaultValue = "1") long id, @ShellOption(defaultValue = "tale") String name){
         try {
-            int update = genreService.update(id, name);
-            return update == 1 ? "update " + getGenreInfo(id, name) : "don't update " + getGenreInfo(id, name);
+            boolean update = genreService.update(id, name);
+            return update ? "update " + getGenreInfo(id, name) : "don't update " + getGenreInfo(id, name);
         } catch (DataAccessException e){
             return "don't update " + getGenreInfo(id, name);
         }
@@ -71,5 +73,9 @@ public class GenreShell {
         StringBuilder sb = new StringBuilder();
         sb.append("Genre: id - ").append(id).append(", name - ").append(name);
         return sb.toString();
+    }
+
+    private static Optional<String> getGenreInfo(Optional<Genre> optionalGenre){
+        return optionalGenre.map(genre -> getGenreInfo(genre.getId(), genre.getName()));
     }
 }
