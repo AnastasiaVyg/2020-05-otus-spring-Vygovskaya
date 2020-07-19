@@ -19,11 +19,11 @@ public class Book {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(targetEntity = Author.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Author.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @OneToOne(targetEntity = Genre.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Genre.class, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinColumn(name = "genre_id")
     private Genre genre;
 

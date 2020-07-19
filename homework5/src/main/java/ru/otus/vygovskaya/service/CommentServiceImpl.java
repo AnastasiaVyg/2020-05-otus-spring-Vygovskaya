@@ -3,10 +3,10 @@ package ru.otus.vygovskaya.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.vygovskaya.dao.BookDao;
-import ru.otus.vygovskaya.dao.CommentDao;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Comment;
+import ru.otus.vygovskaya.repository.BookRepository;
+import ru.otus.vygovskaya.repository.CommentRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,38 +14,38 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService{
 
-    private final CommentDao commentDao;
+    private final CommentRepository commentRepository;
 
-    private final BookDao bookDao;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public CommentServiceImpl(CommentDao commentDao, BookDao bookDao){
-        this.commentDao = commentDao;
-        this.bookDao = bookDao;
+    public CommentServiceImpl(CommentRepository commentRepository, BookRepository bookRepository){
+        this.commentRepository = commentRepository;
+        this.bookRepository = bookRepository;
     }
 
     @Override
     public List<Comment> getAll() {
-        return commentDao.getAll();
+        return commentRepository.findAll();
     }
 
     @Transactional
     @Override
     public Comment save(String text, long book_id) {
-        Book book = bookDao.getById(book_id).orElseThrow();
+        Book book = bookRepository.findById(book_id).orElseThrow();
         Comment comment = new Comment(text, book);
-        return commentDao.save(comment);
+        return commentRepository.save(comment);
     }
 
     @Override
     public Optional<Comment> getById(long id) {
-        return commentDao.getById(id);
+        return commentRepository.findById(id);
     }
 
     @Transactional
     @Override
     public void deleteById(long id) {
-        commentDao.deleteById(id);
+        commentRepository.deleteById(id);
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService{
         if (optionalComment.isPresent()){
             Comment comment = optionalComment.get();
             comment.setText(text);
-            commentDao.save(comment);
+            commentRepository.save(comment);
             return true;
         } else {
             return false;
