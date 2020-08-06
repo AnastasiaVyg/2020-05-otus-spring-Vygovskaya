@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost
+      port: 27017
+      database: booksLibrary
+      changelogs-package: "ru.otus.vygovskaya.changelogs"
