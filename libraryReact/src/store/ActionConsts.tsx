@@ -1,0 +1,22 @@
+export const LOAD_AUTHORS = 'LOAD_AUTHORS'
+export const LOAD_GENRES = 'LOAD_GENRES'
+export const LOAD_BOOKS = 'LOAD_BOOKS'
+export const LOAD_COMMENTS = 'LOAD_COMMENTS'
+
+export const ADD_GENRE = 'ADD_GENRE'
+export const UPDATE_GENRE = 'UPDATE_GENRE'
+export const DELETE_GENRE = 'DELETE_GENRE'
+
+export const ADD_AUTHOR = 'ADD_AUTHOR'
+export const UPDATE_AUTHOR = 'UPDATE_AUTHOR'
+export const DELETE_AUTHOR = 'DELETE_AUTHOR'
+
+export const ADD_BOOK = 'ADD_BOOK'
+export const UPDATE_BOOK = 'UPDATE_BOOK'
+export const DELETE_BOOK = 'DELETE_BOOK'
+
+export const ADD_COMMENT = 'ADD_COMMENT'
+
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE'
+export const CLEAR_ERROR_MESSAGE = 'CLEAR_ERROR_MESSAGE'
+
