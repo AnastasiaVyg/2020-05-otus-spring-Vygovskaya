@@ -109,20 +109,19 @@ export function storable(state: AppState = initialState, action: any): AppState 
 }
 
 function setErrorMessage(state: AppState, message: string): AppState {
-    state.errorMessage = message
-    return state
+    // state.errorMessage = message
+    return {...state, errorMessage: message}
 }
 
+
 function loadedGenres(state: AppState, genres: Array<Genre>): AppState {
-    state.genres = [...genres]
-    state.isLoadedGenres = true
-    return state
+    // state.genres = [...genres]
+    // state.isLoadedGenres = true
+    return {...state, genres: genres, isLoadedGenres: true}
 }
 
 function loadedAuthors(state: AppState, authors: Array<Author>): AppState {
-    state.authors = [...authors]
-    state.isLoadedAuthors = true
-    return state
+    return {...state, authors: authors, isLoadedAuthors: true}
 }
 
 function loadedBooks(state: AppState, booksDto: Array<BookDto>): AppState {
@@ -157,21 +156,21 @@ function loadedComments(state: AppState, comments: Array<string>, bookId: string
     const bookIndex = getIndex(books, bookId)
     books[bookIndex].comments = comments
     books[bookIndex].isLoadedComments = true
-    state.books =  [...books]
-    return state
+    // state.books =  [...books]
+    return {...state, books: [...books]}
 }
 
 function addComment(state: AppState, comment: string, bookId: string): AppState{
     const books = state.books
     const bookIndex = getIndex(books, bookId)
     books[bookIndex].addComment(comment)
-    state.books = [...books]
-    return state
+    // state.books = [...books]
+    return {...state, books: [...books]}
 }
 
 function addGenre(state: AppState, genre: Genre): AppState {
-    state.genres = [...state.genres, genre]
-    return state
+    // state.genres = [...state.genres, genre]
+    return {...state, genres: [...state.genres, genre]}
 }
 
 function updateGenre(state: AppState, id: string, name: string): AppState {
@@ -179,8 +178,8 @@ function updateGenre(state: AppState, id: string, name: string): AppState {
     const index = getIndex(genres, id)
     genres[index].name = name
 
-    state.genres = [...genres]
-    return state
+    // state.genres = [...genres]
+    return {...state, genres: [...genres]}
 }
 
 function deleteGenre(state: AppState, id: string): AppState {
@@ -201,14 +200,14 @@ function deleteGenre(state: AppState, id: string): AppState {
         }
     }
 
-    state.genres = newGenres
-    state.books = newBooks
-    return state
+    // state.genres = newGenres
+    // state.books = newBooks
+    return {...state, genres: newGenres, books: newBooks}
 }
 
 function addAuthor(state: AppState, author: Author): AppState {
-    state.authors = [...state.authors, author]
-    return state
+    // state.authors = [...state.authors, author]
+    return {...state, authors: [...state.authors, author]}
 }
 
 function updateAuthor(state: AppState, id: string, name: string, surname: string): AppState {
@@ -217,8 +216,8 @@ function updateAuthor(state: AppState, id: string, name: string, surname: string
     authors[index].name = name
     authors[index].surname = surname
 
-    state.authors = [...authors]
-    return state
+    // state.authors = [...authors]
+    return {...state, authors: [...authors]}
 }
 
 interface Identifier {
@@ -325,6 +324,6 @@ function deleteBook(state: AppState, id: string): AppState {
             newBooks.push(books[i])
         }
     }
-    state.books = newBooks
-    return state
+    // state.books = newBooks
+    return {...state, books: newBooks}
 }
