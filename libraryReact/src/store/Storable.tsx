@@ -109,14 +109,11 @@ export function storable(state: AppState = initialState, action: any): AppState 
 }
 
 function setErrorMessage(state: AppState, message: string): AppState {
-    // state.errorMessage = message
     return {...state, errorMessage: message}
 }
 
 
 function loadedGenres(state: AppState, genres: Array<Genre>): AppState {
-    // state.genres = [...genres]
-    // state.isLoadedGenres = true
     return {...state, genres: genres, isLoadedGenres: true}
 }
 
@@ -156,7 +153,6 @@ function loadedComments(state: AppState, comments: Array<string>, bookId: string
     const bookIndex = getIndex(books, bookId)
     books[bookIndex].comments = comments
     books[bookIndex].isLoadedComments = true
-    // state.books =  [...books]
     return {...state, books: [...books]}
 }
 
@@ -164,12 +160,10 @@ function addComment(state: AppState, comment: string, bookId: string): AppState{
     const books = state.books
     const bookIndex = getIndex(books, bookId)
     books[bookIndex].addComment(comment)
-    // state.books = [...books]
     return {...state, books: [...books]}
 }
 
 function addGenre(state: AppState, genre: Genre): AppState {
-    // state.genres = [...state.genres, genre]
     return {...state, genres: [...state.genres, genre]}
 }
 
@@ -177,8 +171,6 @@ function updateGenre(state: AppState, id: string, name: string): AppState {
     const genres = state.genres
     const index = getIndex(genres, id)
     genres[index].name = name
-
-    // state.genres = [...genres]
     return {...state, genres: [...genres]}
 }
 
@@ -199,14 +191,10 @@ function deleteGenre(state: AppState, id: string): AppState {
             newBooks.push(books[i])
         }
     }
-
-    // state.genres = newGenres
-    // state.books = newBooks
     return {...state, genres: newGenres, books: newBooks}
 }
 
 function addAuthor(state: AppState, author: Author): AppState {
-    // state.authors = [...state.authors, author]
     return {...state, authors: [...state.authors, author]}
 }
 
@@ -215,8 +203,6 @@ function updateAuthor(state: AppState, id: string, name: string, surname: string
     const index = getIndex(authors, id)
     authors[index].name = name
     authors[index].surname = surname
-
-    // state.authors = [...authors]
     return {...state, authors: [...authors]}
 }
 
@@ -324,6 +310,5 @@ function deleteBook(state: AppState, id: string): AppState {
             newBooks.push(books[i])
         }
     }
-    // state.books = newBooks
     return {...state, books: newBooks}
 }
