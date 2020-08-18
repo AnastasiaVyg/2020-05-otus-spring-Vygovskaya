@@ -55,15 +55,33 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public boolean updateNameById(String id, String name) {
+    public boolean updateById(String id, String name, String authorId, String genreId, int year) {
         Optional<Book> optionalBook = bookRepository.findById(id);
         if (optionalBook.isPresent()){
             Book book = optionalBook.get();
             book.setName(name);
+            Author author = authorRepository.findById(authorId).orElseThrow();
+            Genre genre = genreRepository.findById(genreId).orElseThrow();
+            book.setAuthor(author);
+            book.setGenre(genre);
+            book.setYear(year);
             bookRepository.save(book);
             return true;
         } else {
             return  false;
+        }
+    }
+
+    @Override
+    public boolean addComment(String id, String comment) {
+        Optional<Book> optionalBook = bookRepository.findById(id);
+        if (optionalBook.isPresent()){
+            Book book = optionalBook.get();
+            book.addComment(comment);
+            bookRepository.save(book);
+            return true;
+        } else {
+            return false;
         }
     }
 
