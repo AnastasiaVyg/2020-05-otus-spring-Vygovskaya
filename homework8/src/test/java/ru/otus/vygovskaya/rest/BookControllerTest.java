@@ -1,119 +1,144 @@
 package ru.otus.vygovskaya.rest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
+import ru.otus.vygovskaya.repository.AuthorRepository;
+import ru.otus.vygovskaya.repository.BookRepository;
+import ru.otus.vygovskaya.repository.GenreRepository;
 import ru.otus.vygovskaya.rest.dto.BookDto;
 import ru.otus.vygovskaya.rest.dto.CommentDto;
-import ru.otus.vygovskaya.service.BookService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static ru.otus.vygovskaya.rest.Utils.asJsonString;
 
-@WebMvcTest(BookController.class)
+@SpringBootTest
 class BookControllerTest {
 
     private static final String BOOK_NAME_1 = "Ruslan and Ludmila";
     private static final String BOOK_NAME_2 = "Story about the fisherman and golden fish";
     private static final String BOOK_NAME_3 = "Borodino";
 
-    @Autowired
-    private MockMvc mvc;
-
     @MockBean
-    private BookService bookService;
+    private GenreRepository genreRepository;
+    @MockBean
+    private BookRepository bookRepository;
+    @MockBean
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    @Qualifier("bookRouters")
+    private RouterFunction router;
+
+    private WebTestClient client;
+
+    @BeforeEach
+    void before(){
+        client = WebTestClient.bindToRouterFunction(router)
+                .build();
+    }
 
     @Test
-    void getAllBooks() throws Exception {
+    void getAllBooks(){
         List<Book> books = new ArrayList<>();
         Genre genre = new Genre("1", "story");
         Author author = new Author("1", "Alexander", "Pushkin");
         books.add(new Book("1", BOOK_NAME_1, author, genre, 1892));
 
-        when(bookService.getAll()).thenReturn(books);
+        when(bookRepository.findAll()).thenReturn(Flux.fromIterable(books));
 
-        mvc.perform(get("/books"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[{'id':'1','name':'Ruslan and Ludmila', 'authorId':'1', 'genreId':'1', 'year':1892}]"));
+        client.get().uri("/books").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].name").isEqualTo(BOOK_NAME_1)
+                .jsonPath("$[0].authorId").isEqualTo("1")
+                .jsonPath("$[0].genreId").isEqualTo("1")
+                .jsonPath("$[0].year").isEqualTo(1892);
     }
 
     @Test
-    void addBook() throws Exception {
+    void addBook(){
         Genre genre = new Genre("2", "story");
         Author author = new Author("2", "Alexander", "Pushkin");
         Book book = new Book("2", BOOK_NAME_2, author, genre, 2020);
         BookDto bookDto = new BookDto("2", BOOK_NAME_2, "2", "2", 2020);
-        when(bookService.save(BOOK_NAME_2, "2", "2", 2020)).thenReturn(book);
+        when(genreRepository.findById("2")).thenReturn(Mono.just(genre));
+        when(authorRepository.findById("2")).thenReturn(Mono.just(author));
+        when(bookRepository.save(book)).thenReturn(Mono.just(book));
 
-        mvc.perform(post("/books")
-                .content(asJsonString(bookDto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("2"))
-                .andExpect(jsonPath("$.name").value(BOOK_NAME_2))
-                .andExpect(jsonPath("$.authorId").value("2"))
-                .andExpect(jsonPath("$.genreId").value("2"))
-                .andExpect(jsonPath("$.year").value(2020));
+        client.post().uri("/books").body(BodyInserters.fromPublisher(Mono.just(bookDto), BookDto.class)).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("name").isEqualTo(BOOK_NAME_2)
+                .jsonPath("authorId").isEqualTo("2")
+                .jsonPath("genreId").isEqualTo("2")
+                .jsonPath("year").isEqualTo(2020);
     }
 
     @Test
-    void updateBook() throws Exception {
-        BookDto bookDto = new BookDto("1", BOOK_NAME_3, "1", "1", 1892);
-        when(bookService.updateById("1", BOOK_NAME_3, "1", "1", 1892)).thenReturn(true);
+    void updateBook(){
+        Genre genre = new Genre("2", "story");
+        Author author = new Author("2", "Alexander", "Pushkin");
+        Book book = new Book("1", BOOK_NAME_2, author, genre, 2020);
+        BookDto bookDto = new BookDto("1", BOOK_NAME_2, "2", "2", 2020);
+        when(genreRepository.findById("2")).thenReturn(Mono.just(genre));
+        when(authorRepository.findById("2")).thenReturn(Mono.just(author));
+        when(bookRepository.update(book)).thenReturn(Mono.just(book));
 
-        mvc.perform(put("/books/{id}", "1")
-                .content(asJsonString(bookDto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+        client.put().uri("/books/{id}", "1").body(BodyInserters.fromPublisher(Mono.just(bookDto), BookDto.class)).exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class).isEqualTo(true);
     }
 
     @Test
-    void deleteBook() throws Exception {
-        mvc.perform(delete("/books/{id}", "1"))
-                .andExpect(status().isOk());
+    void deleteBook(){
+        when(bookRepository.deleteById("2")).thenReturn(Mono.empty());
+
+        client.delete().uri("/books/{id}", "2").exchange()
+                .expectStatus().isOk();
     }
 
     @Test
-    void getComments() throws Exception {
+    void getComments(){
         Genre genre = new Genre("2", "story");
         Author author = new Author("2", "Alexander", "Pushkin");
         Book book = new Book("2", BOOK_NAME_2, author, genre, 2020);
         book.addComment("Great!");
         book.addComment("Test");
-        when(bookService.getById("1")).thenReturn(Optional.of(book));
+        when(bookRepository.findById("2")).thenReturn(Mono.just(book));
 
-        mvc.perform(get("/books/{id}/comments", "1"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("['Great!','Test']"));
+        client.get().uri("/books/{id}/comments", "2").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .json("['Great!','Test']");
     }
 
     @Test
-    void addComment() throws Exception {
+    void addComment(){
+        Genre genre = new Genre("2", "story");
+        Author author = new Author("2", "Alexander", "Pushkin");
+        Book book = new Book("2", BOOK_NAME_2, author, genre, 2020);
+
         CommentDto comment = new CommentDto();
         comment.setComment("new comment");
-        when(bookService.addComment("1", comment.getComment())).thenReturn(true);
+        when(bookRepository.findById("2")).thenReturn(Mono.just(book));
+        when(bookRepository.save(book)).thenReturn(Mono.just(book));
 
-        mvc.perform(post("/books/{id}/comments", "1")
-                .content(asJsonString(comment))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+        client.post().uri("/books/{id}/comments", "2").body(BodyInserters.fromPublisher(Mono.just(comment), CommentDto.class)).exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class).isEqualTo(true);
     }
 }

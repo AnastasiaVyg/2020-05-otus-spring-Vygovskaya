@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.ComponentScan;
+import reactor.test.StepVerifier;
+import reactor.core.publisher.Flux;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
@@ -29,26 +31,20 @@ class BookRepositoryCustomImplTest {
     private GenreRepository genreRepository;
 
     @Test
-    @DisplayName("должен при удалении жанра удалять все книги с удаленным жанром")
+    @DisplayName("должен удалять все книги с id жанра")
     void removeBooksByGenreId() {
-        int size = bookRepository.findAll().size();
-
-        Genre genre = genreRepository.findAll().get(1);
-        genreRepository.delete(genre);
-
-        List<Book> actualBooks = bookRepository.findAll();
-        assertThat(actualBooks.size()).isEqualTo(size - 1);
+        StepVerifier.create(bookRepository.removeBooksByGenreId("111111111111111111111111"))
+                .assertNext(deleteResult -> assertThat(deleteResult.getDeletedCount()).isGreaterThan(0))
+                .expectComplete()
+                .verify();
     }
 
     @Test
-    @DisplayName("должен при удалении автора удалять все книги с удаленным автором")
+    @DisplayName("должен удалять все книги с id автора")
     void removeBooksByAuthorId() {
-        int size = bookRepository.findAll().size();
-
-        Author author = authorRepository.findAll().get(0);
-        authorRepository.delete(author);
-
-        List<Book> actualBooks = bookRepository.findAll();
-        assertThat(actualBooks.size()).isEqualTo(size - 2);
+        StepVerifier.create(bookRepository.removeBooksByAuthorId("222222222222222222222222"))
+                .assertNext(deleteResult -> assertThat(deleteResult.getDeletedCount()).isGreaterThan(0))
+                .expectComplete()
+                .verify();
     }
 }
