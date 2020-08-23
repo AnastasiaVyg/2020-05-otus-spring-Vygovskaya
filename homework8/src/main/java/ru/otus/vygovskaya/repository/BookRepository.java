@@ -1,14 +1,13 @@
 package ru.otus.vygovskaya.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
 
-import java.util.List;
+public interface BookRepository extends ReactiveMongoRepository<Book, String>, BookRepositoryCustom {
 
-public interface BookRepository extends MongoRepository<Book, String>, BookRepositoryCustom {
-
-    List<Book> findAllByAuthor(Author author);
-    List<Book> findAllByGenre(Genre genre);
+    Flux<Book> findAllByAuthor(Author author);
+    Flux<Book> findAllByGenre(Genre genre);
 }

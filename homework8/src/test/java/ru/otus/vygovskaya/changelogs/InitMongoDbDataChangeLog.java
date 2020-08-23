@@ -7,6 +7,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
@@ -26,13 +27,13 @@ public class InitMongoDbDataChangeLog {
         IndexOptions indexOptions = new IndexOptions().unique(true);
         genres.createIndex(Indexes.ascending("name"), indexOptions);
 
-        Genre storyGenre = template.save(new Genre("story"));
+        Genre storyGenre = template.save(new Genre("111111111111111111111111", "story"));
         Genre poemGenre = template.save(new Genre("poem"));
 
         MongoCollection<Document> authors = template.createCollection("author");
         authors.createIndex(Indexes.ascending("name", "surname"), indexOptions);
         Author authorPushkin = template.save(new Author("Alexander", "Pushkin"));
-        Author authorLermontov = template.save(new Author("Mikhail", "Lermontov"));
+        Author authorLermontov = template.save(new Author( "222222222222222222222222","Mikhail", "Lermontov"));
 
         MongoCollection<Document> books = template.createCollection("book");
         books.createIndex(Indexes.ascending("name", "author"), indexOptions);

@@ -1,11 +1,14 @@
 package ru.otus.vygovskaya.rest.dto;
 
 public class BookDto {
-    private final String id;
-    private final String name;
-    private final String authorId;
-    private final String genreId;
-    private final int year;
+    private String id;
+    private String name;
+    private String authorId;
+    private String genreId;
+    private int year;
+
+    public BookDto() {
+    }
 
     public BookDto(String id, String name, String authorId, String genreId, int year) {
         this.id = id;
@@ -33,5 +36,25 @@ public class BookDto {
 
     public int getYear() {
         return year;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
+    }
+
+    public void setGenreId(String genreId) {
+        this.genreId = genreId;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 }

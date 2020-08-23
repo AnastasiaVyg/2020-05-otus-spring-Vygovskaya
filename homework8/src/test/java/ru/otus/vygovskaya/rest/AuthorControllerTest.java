@@ -1,23 +1,26 @@
 package ru.otus.vygovskaya.rest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.vygovskaya.domain.Author;
-import ru.otus.vygovskaya.service.AuthorService;
+import ru.otus.vygovskaya.repository.AuthorRepository;
+import ru.otus.vygovskaya.repository.BookRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ru.otus.vygovskaya.rest.Utils.asJsonString;
 
-@WebMvcTest(AuthorController.class)
+@SpringBootTest
 class AuthorControllerTest {
 
     private static final String AUTHOR_NAME_1 = "Alexander";
@@ -27,54 +30,73 @@ class AuthorControllerTest {
     private static final String AUTHOR_NAME_3 = "Agatha";
     private static final String AUTHOR_SURNAME_3 = "Christie";
 
-    @Autowired
-    private MockMvc mvc;
-
     @MockBean
-    private AuthorService authorService;
+    private AuthorRepository authorRepository;
+    @MockBean
+    private BookRepository bookRepository;
+
+    @Autowired
+    @Qualifier("authorRouters")
+    private RouterFunction  router;
+
+    private WebTestClient client;
+
+    @BeforeEach
+    void before(){
+        client = WebTestClient.bindToRouterFunction(router)
+                .build();
+    }
 
     @Test
-    void getAllAuthors() throws Exception {
+    void getAllAuthors() {
         List<Author> authors = new ArrayList<>();
-        authors.add(new Author("1", AUTHOR_NAME_1, AUTHOR_SURNAME_1));
+        Author author1 = new Author(AUTHOR_NAME_1, AUTHOR_SURNAME_1);
+        Author author2 = new Author(AUTHOR_NAME_2, AUTHOR_SURNAME_2);
+        authors.add(author1);
+        authors.add(author2);
 
-        when(authorService.getAll()).thenReturn(authors);
+        when(authorRepository.findAll()).thenReturn(Flux.fromIterable(authors));
 
-        mvc.perform(get("/authors"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[{'id':'1','name':'Alexander','surname':'Pushkin'}]"));
+        client.get().uri("/authors").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].name").isEqualTo(AUTHOR_NAME_1)
+                .jsonPath("$[0].surname").isEqualTo(AUTHOR_SURNAME_1)
+                .jsonPath("$[1].name").isEqualTo(AUTHOR_NAME_2)
+                .jsonPath("$[1].surname").isEqualTo(AUTHOR_SURNAME_2);
     }
 
     @Test
-    void addAuthor() throws Exception {
-        Author author = new Author("2", AUTHOR_NAME_2, AUTHOR_SURNAME_2);
-        when(authorService.save(AUTHOR_NAME_2, AUTHOR_SURNAME_2)).thenReturn(author);
+    void addAuthor(){
+        Author author = new Author(AUTHOR_NAME_3, AUTHOR_SURNAME_3);
+        when(authorRepository.save(author)).thenReturn(Mono.just(author));
 
-        mvc.perform(post("/authors")
-                .content(asJsonString(author))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("2"))
-                .andExpect(jsonPath("$.name").value(AUTHOR_NAME_2))
-                .andExpect(jsonPath("$.surname").value(AUTHOR_SURNAME_2));
+        client.post().uri("/authors").body(BodyInserters.fromPublisher(Mono.just(author), Author.class)).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("name").isEqualTo(AUTHOR_NAME_3)
+                .jsonPath("surname").isEqualTo(AUTHOR_SURNAME_3);
     }
 
     @Test
-    void updateAuthor() throws Exception {
-        when(authorService.update("1", AUTHOR_NAME_3, AUTHOR_SURNAME_3)).thenReturn(true);
+    void updateAuthor(){
+        String newName = "newName";
+        String newSurname = "newSurname";
+        Author edit = new Author("1", newName, newSurname);
+        when(authorRepository.update("1", newName, newSurname)).thenReturn(Mono.just(edit));
 
-        mvc.perform(put("/authors/{id}", "1")
-                .content(asJsonString(new Author(AUTHOR_NAME_3, AUTHOR_SURNAME_3)))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+        client.put().uri("/authors/{id}", "1").body(BodyInserters.fromPublisher(Mono.just(edit), Author.class)).exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class).isEqualTo(true);
+
     }
 
     @Test
-    void deleteAuthor() throws Exception {
-        mvc.perform(delete("/authors/{id}", "1"))
-                .andExpect(status().isOk());
+    void deleteAuthor(){
+        when(authorRepository.deleteById("2")).thenReturn(Mono.empty());
+        when(bookRepository.removeBooksByAuthorId("2")).thenReturn(Mono.empty());
+
+        client.delete().uri("/authors/{id}", "2").exchange()
+                .expectStatus().isOk();
     }
 }

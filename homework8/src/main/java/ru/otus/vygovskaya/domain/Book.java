@@ -1,7 +1,9 @@
 package ru.otus.vygovskaya.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.otus.vygovskaya.rest.dto.BookDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +17,10 @@ public class Book {
 
     private String name;
 
+    @DBRef
     private Author author;
 
+    @DBRef
     private Genre genre;
 
     private int year;
@@ -99,5 +103,9 @@ public class Book {
 
     public void addComment(String comment){
         comments.add(comment);
+    }
+
+    public BookDto getDto(){
+        return new BookDto(id, name, author.getId(), genre.getId(), year);
     }
 }
