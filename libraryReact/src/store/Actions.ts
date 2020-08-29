@@ -6,9 +6,9 @@ import {
     DELETE_GENRE,
     LOAD_AUTHORS,
     LOAD_BOOKS, LOAD_COMMENTS,
-    LOAD_GENRES, SET_ERROR_MESSAGE,
+    LOAD_GENRES, SHOW_LOGIN_DIALOG, SET_ERROR_MESSAGE,
     UPDATE_AUTHOR, UPDATE_BOOK,
-    UPDATE_GENRE
+    UPDATE_GENRE, CLEAR_DATA
 } from "./ActionConsts";
 import {Author} from "../model/Author";
 import {BookDto} from "../model/Book";
@@ -20,228 +20,305 @@ const GENRES_URL = '/genres'
 const AUTHORS_URL = '/authors'
 const BOOKS_URL = '/books'
 
-export function loadGenres(dispatch: Dispatch<any>) {
-    fetch(GENRES_URL).then(response => {
+export interface FetchProps {
+    url: string
+    method: string
+    body: string
+    responseFunc: { (r: Response): void }
+}
+
+function baseFetch(dispatch: Dispatch<any>, props: FetchProps) {
+    let responseHandle = (response: Response) => {
         if (response.ok){
-            response.json().then(data => {
-                const genres = data as Array<Genre>
-                dispatch({type: LOAD_GENRES, data: genres})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке данных"})
+            props.responseFunc(response)
+        }
+        if (response.status === 401) {
+            dispatch({type: SHOW_LOGIN_DIALOG, data: true, fetchProps: props})
+        }
+    }
+    let errorHandle = (e: any) => dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке данных"})
+
+    if (props.body === "")
+        fetch(props.url, {
+            method: props.method,
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            }
+        }).then(responseHandle).catch(errorHandle)
+    else
+        fetch(props.url, {
+            method: props.method,
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: props.body
+        }).then(responseHandle).catch(errorHandle)
+}
+
+export function loginFetch(dispatch: Dispatch<any>, login: String, password: String, props: FetchProps) {
+
+    fetch("/login", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        credentials: "include",
+        redirect: "manual",
+        body: "username=" + login +"&password=" + password
+    }).then(response => {
+        console.log(response.status)
+        dispatch({type: SHOW_LOGIN_DIALOG, data: false})
+        if (response.ok){
+            console.log(response.url)
+            baseFetch(dispatch, props)
+        } else {
+            dispatch({type: SHOW_LOGIN_DIALOG, data: true})
+        }
     })
+}
+
+export function logoutFetch(dispatch: Dispatch<any>) {
+    fetch("/logout", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        redirect: "manual"
+    }).then(response => {
+        dispatch({type: SHOW_LOGIN_DIALOG, data: true})
+        dispatch({type: CLEAR_DATA})
+    })
+}
+
+export function loadGenres(dispatch: Dispatch<any>) {
+    let props = {
+        url: GENRES_URL,
+        method: 'GET',
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    const genres = data as Array<Genre>
+                    dispatch({type: LOAD_GENRES, data: genres})
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function loadAuthors(dispatch: Dispatch<any>) {
-    fetch(AUTHORS_URL).then(response => {
-        if (response.ok){
-            response.json().then(data => {
-                const authors = data as Array<Author>
-                dispatch({type: LOAD_AUTHORS, data: authors})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке данных"})
-    })
+    let props = {
+        url: AUTHORS_URL,
+        method: 'GET',
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    const authors = data as Array<Author>
+                    dispatch({type: LOAD_AUTHORS, data: authors})
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function loadBooks(dispatch: Dispatch<any>) {
-    fetch(BOOKS_URL).then(response => {
-        if (response.ok){
-            response.json().then(data => {
-                const books = data as Array<BookDto>
-                dispatch({type: LOAD_BOOKS, data: books})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке данных"})
-    })
+    let props = {
+        url: BOOKS_URL,
+        method: 'GET',
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    const books = data as Array<BookDto>
+                    dispatch({type: LOAD_BOOKS, data: books})
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function addGenre(dispatch: Dispatch<any>, name: string) {
-    fetch(GENRES_URL, {
+    let props = {
+        url: GENRES_URL,
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: name})
-    }).then(response => {
-        if (response.ok) {
-            response.json().then(data => {
+        body: JSON.stringify({name: name}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
                     const genre = data as Genre
                     dispatch({type: ADD_GENRE, data: genre})
-                }
-            )
-        }}).catch(e => {
-            dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при добавлении жанра"})
-    })
-
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function updateGenre(dispatch: Dispatch<any>, genreRow: GenreRow) {
-    fetch(GENRES_URL + "/" + genreRow.genre.id, {
+    let props = {
+        url: GENRES_URL + "/" + genreRow.genre.id,
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: genreRow.name})
-    }).then(response => {
-        if (response.ok) {
-            response.json().then(data => {
-                if (data === true) {
-                    dispatch({type: UPDATE_GENRE, row: genreRow})
-                }
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при обновлении жанра"})
-    })
+        body: JSON.stringify({name: genreRow.name}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    if (data === true) {
+                        dispatch({type: UPDATE_GENRE, row: genreRow})
+                    }
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function deleteGenre(dispatch: Dispatch<any>, id: string) {
-    fetch(GENRES_URL + "/" + id, {
+    let props = {
+        url: GENRES_URL + "/" + id,
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                dispatch({type: DELETE_GENRE, data: id})
+            }
         }
-    }).then(responce => {
-        if (responce.ok) {
-            dispatch({type: DELETE_GENRE, data: id})
-        }
-    }).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при удалении жанра"})
-    })
+    }
+    baseFetch(dispatch, props)
 }
 
 export function addAuthor(dispatch: Dispatch<any>, name: string, surname: string) {
-    fetch(AUTHORS_URL, {
+    let props = {
+        url: AUTHORS_URL,
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: name, surname: surname})
-    }).then(response => {
-        if (response.ok){
-            response.json().then(data => {
-                const author = data as Author
-                dispatch({type: ADD_AUTHOR, data: author})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при добавлении автора"})
-    })
+        body: JSON.stringify({name: name, surname: surname}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    const author = data as Author
+                    dispatch({type: ADD_AUTHOR, data: author})
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function updateAuthor(dispatch: Dispatch<any>, authorRow: AuthorRow) {
-    fetch(AUTHORS_URL + "/" + authorRow.author.id, {
+    let props = {
+        url: AUTHORS_URL + "/" + authorRow.author.id,
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: authorRow.name, surname: authorRow.surname})
-    }).then(response => {
-        if (response.ok){
-            response.json().then(data => {
-                if (data === true) {
-                    dispatch({type: UPDATE_AUTHOR, row: authorRow})
-                }
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при обновлении автора"})
-    })
+        body: JSON.stringify({name: authorRow.name, surname: authorRow.surname}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    if (data === true) {
+                        dispatch({type: UPDATE_AUTHOR, row: authorRow})
+                    }
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function deleteAuthor(dispatch: Dispatch<any>, id: string) {
-    fetch(AUTHORS_URL + "/" + id, {
+    let props = {
+        url: AUTHORS_URL + "/" + id,
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                dispatch({type: DELETE_AUTHOR, data: id})
+            }
         }
-    }).then(responce => {
-        if (responce.ok) {
-            dispatch({type: DELETE_AUTHOR, data: id})
-        }
-    }).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при удалении автора"})
-    })
+    }
+    baseFetch(dispatch, props)
 }
 
 export function addBook(dispatch: Dispatch<any>, bookRow: BookRow) {
-    fetch(BOOKS_URL, {
+    let props = {
+        url: BOOKS_URL,
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: bookRow.name, authorId: bookRow.author, genreId: bookRow.genre, year: bookRow.year})
-    }).then(response => {
-        if (response.ok) {
-            response.json().then(data => {
-                const bookDto = data as BookDto
-                dispatch({type: ADD_BOOK, data: bookDto})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при добавлении книги"})
-    })
+        body: JSON.stringify({name: bookRow.name, authorId: bookRow.author, genreId: bookRow.genre, year: bookRow.year}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    const bookDto = data as BookDto
+                    dispatch({type: ADD_BOOK, data: bookDto})
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function updateBook(dispatch: Dispatch<any>, bookRow: BookRow) {
-    fetch(BOOKS_URL + "/" + bookRow.book.id, {
+    let props = {
+        url: BOOKS_URL + "/" + bookRow.book.id,
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({name: bookRow.name, authorId: bookRow.author, genreId: bookRow.genre, year: bookRow.year})
-    }).then(response => {
-        if (response.ok) {
-            response.json().then(data => {
-                if (data === true) {
-                    dispatch({type: UPDATE_BOOK, row: bookRow})
-                }
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при обновлении книги"})
-    })
+        body: JSON.stringify({name: bookRow.name, authorId: bookRow.author, genreId: bookRow.genre, year: bookRow.year}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    if (data === true) {
+                        dispatch({type: UPDATE_BOOK, row: bookRow})
+                    }
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function deleteBook(dispatch: Dispatch<any>, id: string) {
-    fetch(BOOKS_URL + "/" + id, {
+    let props = {
+        url: BOOKS_URL + "/" + id,
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+        body: "",
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                dispatch({type: DELETE_BOOK, data: id})
+            }
         }
-    }).then(responce => {
-        if (responce.ok) {
-            dispatch({type: DELETE_BOOK, data: id})
-        }
-    }).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при удалении книги"})
-    })
+    }
+    baseFetch(dispatch, props)
 }
 
 export function loadComments(dispatch: Dispatch<any>, id: string) {
-    fetch(BOOKS_URL + "/" + id + "/comments")
-        .then(response => {
+    let props = {
+        url: BOOKS_URL + "/" + id + "/comments",
+        method: 'GET',
+        body: "",
+        responseFunc: (response: Response) => {
             if (response.ok) {
                 response.json().then(data => {
                     const comments = data as Array<string>
                     dispatch({type: LOAD_COMMENTS, comments: comments, id: id})
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке комментариев"})
-    })
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }
 
 export function addComment(dispatch: Dispatch<any>, bookId: string, comment: string) {
-    fetch(BOOKS_URL + "/" + bookId + "/comments", {
+    let props = {
+        url: BOOKS_URL + "/" + bookId + "/comments",
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({comment: comment})
-    }).then(response => {
-        if (response.ok){
-            response.json().then(data => {
-                if (data === true) {
-                    dispatch({type: ADD_COMMENT, comment: comment, id: bookId})
-                }
-            })
-        }}).catch(e => {
-        dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при добавлении комментария"})
-    })
+        body: JSON.stringify({comment: comment}),
+        responseFunc: (response: Response) => {
+            if (response.ok) {
+                response.json().then(data => {
+                    if (data === true) {
+                        dispatch({type: ADD_COMMENT, comment: comment, id: bookId})
+                    }
+                })
+            }
+        }
+    }
+    baseFetch(dispatch, props)
 }

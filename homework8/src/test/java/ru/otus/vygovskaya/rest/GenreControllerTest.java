@@ -5,8 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.vygovskaya.domain.Genre;
+import ru.otus.vygovskaya.security.MongoUserDetailsService;
+import ru.otus.vygovskaya.security.RestAuthEntryPoint;
+import ru.otus.vygovskaya.security.SecurityConfiguration;
 import ru.otus.vygovskaya.service.GenreService;
 
 import java.util.ArrayList;
@@ -17,7 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.otus.vygovskaya.rest.Utils.asJsonString;
 
-@WebMvcTest(GenreController.class)
+@WebMvcTest({GenreController.class, SecurityConfiguration.class, MongoUserDetailsService.class, RestAuthEntryPoint.class})
+@ContextConfiguration(classes = TestConfig.class)
 class GenreControllerTest {
 
     private static final String GENRE_1 = "story";
@@ -30,6 +36,7 @@ class GenreControllerTest {
     @MockBean
     private GenreService genreService;
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void getAllGenres() throws Exception {
         List<Genre> genres = new ArrayList<>();
@@ -42,6 +49,7 @@ class GenreControllerTest {
                 .andExpect(content().json("[{'id':'1','name':'story'}]"));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void addGenre() throws Exception {
         when(genreService.save(GENRE_2)).thenReturn(new Genre("2", GENRE_2));
@@ -55,6 +63,7 @@ class GenreControllerTest {
                 .andExpect(jsonPath("$.name").value(GENRE_2));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void updateGenre() throws Exception {
         when(genreService.update("1", GENRE_3)).thenReturn(true);
@@ -67,6 +76,7 @@ class GenreControllerTest {
                 .andExpect(content().string("true"));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void deleteGenres() throws Exception {
         mvc.perform(delete("/genres/{id}", "1"))

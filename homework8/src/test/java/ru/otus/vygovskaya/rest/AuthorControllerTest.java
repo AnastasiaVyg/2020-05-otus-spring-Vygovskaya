@@ -1,12 +1,22 @@
 package ru.otus.vygovskaya.rest;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.vygovskaya.domain.Author;
+import ru.otus.vygovskaya.domain.User;
+import ru.otus.vygovskaya.repository.UserRepository;
+import ru.otus.vygovskaya.security.MongoUserDetailsService;
+import ru.otus.vygovskaya.security.RestAuthEntryPoint;
+import ru.otus.vygovskaya.security.SecurityConfiguration;
 import ru.otus.vygovskaya.service.AuthorService;
 
 import java.util.ArrayList;
@@ -17,7 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.otus.vygovskaya.rest.Utils.asJsonString;
 
-@WebMvcTest(AuthorController.class)
+@WebMvcTest({AuthorController.class, SecurityConfiguration.class, MongoUserDetailsService.class, RestAuthEntryPoint.class})
+@ContextConfiguration(classes = TestConfig.class)
 class AuthorControllerTest {
 
     private static final String AUTHOR_NAME_1 = "Alexander";
@@ -33,11 +44,11 @@ class AuthorControllerTest {
     @MockBean
     private AuthorService authorService;
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void getAllAuthors() throws Exception {
         List<Author> authors = new ArrayList<>();
         authors.add(new Author("1", AUTHOR_NAME_1, AUTHOR_SURNAME_1));
-
         when(authorService.getAll()).thenReturn(authors);
 
         mvc.perform(get("/authors"))
@@ -45,6 +56,7 @@ class AuthorControllerTest {
                 .andExpect(content().json("[{'id':'1','name':'Alexander','surname':'Pushkin'}]"));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void addAuthor() throws Exception {
         Author author = new Author("2", AUTHOR_NAME_2, AUTHOR_SURNAME_2);
@@ -60,6 +72,7 @@ class AuthorControllerTest {
                 .andExpect(jsonPath("$.surname").value(AUTHOR_SURNAME_2));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void updateAuthor() throws Exception {
         when(authorService.update("1", AUTHOR_NAME_3, AUTHOR_SURNAME_3)).thenReturn(true);
@@ -72,6 +85,7 @@ class AuthorControllerTest {
                 .andExpect(content().string("true"));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     void deleteAuthor() throws Exception {
         mvc.perform(delete("/authors/{id}", "1"))
