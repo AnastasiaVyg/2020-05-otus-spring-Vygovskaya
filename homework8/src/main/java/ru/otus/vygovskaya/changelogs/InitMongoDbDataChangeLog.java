@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.vygovskaya.domain.Author;
 import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
+import ru.otus.vygovskaya.domain.User;
 
 @ChangeLog(order = "001")
 public class InitMongoDbDataChangeLog {
@@ -22,8 +23,13 @@ public class InitMongoDbDataChangeLog {
 
     @ChangeSet(order = "001", id = "initData", author = "vygovskaya", runAlways = true)
     public void initData(MongoTemplate template){
-        MongoCollection<Document> genres = template.createCollection("genre");
+        MongoCollection<Document> users = template.createCollection("user");
         IndexOptions indexOptions = new IndexOptions().unique(true);
+        users.createIndex(Indexes.ascending("name"), indexOptions);
+        template.save(new User("admin", "$2a$04$4/2kleogmq5MdMMnGL673.//qM.lAYGUfV/PiRnWpCdKk56NN8XcG", "ADMIN")); //password
+        template.save(new User("ivanov", "$2a$04$DSqmLjUInwwMxtvpV88f1uJ2uYiNSpz3VHSE3fv2o6D3AOOhZ98VO", "USER")); //12345678
+
+        MongoCollection<Document> genres = template.createCollection("genre");
         genres.createIndex(Indexes.ascending("name"), indexOptions);
 
         Genre storyGenre = template.save(new Genre("story"));

@@ -9,11 +9,12 @@ import {
     DELETE_BOOK,
     DELETE_GENRE, LOAD_AUTHORS, LOAD_BOOKS, LOAD_COMMENTS, LOAD_GENRES, SET_ERROR_MESSAGE,
     UPDATE_AUTHOR, UPDATE_BOOK,
-    UPDATE_GENRE
+    UPDATE_GENRE, SHOW_LOGIN_DIALOG, CLEAR_DATA
 } from "./ActionConsts";
 import {GenreRow} from "../view/GenreTable";
 import {AuthorRow} from "../view/AuthorTable";
 import {BookRow} from "../view/BookTable";
+import {FetchProps} from "./Actions";
 
 export interface AppState {
     genres: Array<Genre>
@@ -23,6 +24,8 @@ export interface AppState {
     isLoadedAuthors: boolean
     isLoadedBooks: boolean
     errorMessage: string
+    isShowLoginDialog: boolean
+    fetchProps: FetchProps
 }
 
 const initialState: AppState = {
@@ -32,12 +35,22 @@ const initialState: AppState = {
     isLoadedGenres: false,
     isLoadedAuthors: false,
     isLoadedBooks: false,
-    errorMessage: ""
+    errorMessage: "",
+    isShowLoginDialog: false,
+    fetchProps: {url: "", method:"", body:"", responseFunc: r => {} }
 }
 
 export function storable(state: AppState = initialState, action: any): AppState {
 
     switch (action.type) {
+        case SHOW_LOGIN_DIALOG: {
+            const isShowLogin = action.data as boolean
+            const fetchProps = action.fetchProps as FetchProps
+            return setShowLoginDialog(state, isShowLogin, fetchProps)
+        }
+        case CLEAR_DATA: {
+            return clearData(state)
+        }
         case LOAD_GENRES: {
             const genres = action.data as Array<Genre>
             return loadedGenres(state, genres);
@@ -108,10 +121,31 @@ export function storable(state: AppState = initialState, action: any): AppState 
     }
 }
 
+function setShowLoginDialog(state: AppState, isShowLogin: boolean, fetchProps: FetchProps): AppState {
+    let newFetchProps = state.fetchProps
+    if (fetchProps != null){
+        newFetchProps = fetchProps
+    }
+    return {...state, isShowLoginDialog: isShowLogin, fetchProps: newFetchProps}
+}
+
+function clearData(state: AppState): AppState {
+    return {
+        authors: [],
+        genres: [],
+        books: [],
+        isLoadedGenres: false,
+        isLoadedAuthors: false,
+        isLoadedBooks: false,
+        errorMessage: "",
+        isShowLoginDialog: state.isShowLoginDialog,
+        fetchProps: state.fetchProps
+    }
+}
+
 function setErrorMessage(state: AppState, message: string): AppState {
     return {...state, errorMessage: message}
 }
-
 
 function loadedGenres(state: AppState, genres: Array<Genre>): AppState {
     return {...state, genres: genres, isLoadedGenres: true}
@@ -144,7 +178,9 @@ function loadedBooks(state: AppState, booksDto: Array<BookDto>): AppState {
         isLoadedGenres: state.isLoadedGenres,
         isLoadedAuthors: state.isLoadedAuthors,
         isLoadedBooks: true,
-        errorMessage: ""
+        errorMessage: "",
+        isShowLoginDialog: state.isShowLoginDialog,
+        fetchProps: state.fetchProps
     }
 }
 
@@ -244,7 +280,9 @@ function deleteAuthor(state: AppState, id: string): AppState {
         isLoadedGenres: state.isLoadedGenres,
         isLoadedAuthors: state.isLoadedAuthors,
         isLoadedBooks: state.isLoadedBooks,
-        errorMessage: ""
+        errorMessage: "",
+        isShowLoginDialog: state.isShowLoginDialog,
+        fetchProps: state.fetchProps
     }
 }
 
@@ -261,7 +299,9 @@ function addBook(state: AppState, bookDto: BookDto): AppState {
         isLoadedGenres: state.isLoadedGenres,
         isLoadedAuthors: state.isLoadedAuthors,
         isLoadedBooks: state.isLoadedBooks,
-        errorMessage: ""
+        errorMessage: "",
+        isShowLoginDialog: state.isShowLoginDialog,
+        fetchProps: state.fetchProps
     }
 }
 
@@ -287,7 +327,9 @@ function updateBook(state: AppState, row: BookRow): AppState {
         isLoadedGenres: state.isLoadedGenres,
         isLoadedAuthors: state.isLoadedAuthors,
         isLoadedBooks: state.isLoadedBooks,
-        errorMessage: ""
+        errorMessage: "",
+        isShowLoginDialog: state.isShowLoginDialog,
+        fetchProps: state.fetchProps
     }
 }
 
