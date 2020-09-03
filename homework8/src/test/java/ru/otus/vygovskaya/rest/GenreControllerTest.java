@@ -36,7 +36,7 @@ class GenreControllerTest {
     @MockBean
     private GenreService genreService;
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void getAllGenres() throws Exception {
         List<Genre> genres = new ArrayList<>();
@@ -49,7 +49,7 @@ class GenreControllerTest {
                 .andExpect(content().json("[{'id':'1','name':'story'}]"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void addGenre() throws Exception {
         when(genreService.save(GENRE_2)).thenReturn(new Genre("2", GENRE_2));
@@ -63,7 +63,7 @@ class GenreControllerTest {
                 .andExpect(jsonPath("$.name").value(GENRE_2));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void updateGenre() throws Exception {
         when(genreService.update("1", GENRE_3)).thenReturn(true);
@@ -76,7 +76,7 @@ class GenreControllerTest {
                 .andExpect(content().string("true"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void deleteGenres() throws Exception {
         mvc.perform(delete("/genres/{id}", "1"))

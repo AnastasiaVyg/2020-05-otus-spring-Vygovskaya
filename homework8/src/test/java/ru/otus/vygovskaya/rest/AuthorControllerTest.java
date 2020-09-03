@@ -44,7 +44,7 @@ class AuthorControllerTest {
     @MockBean
     private AuthorService authorService;
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void getAllAuthors() throws Exception {
         List<Author> authors = new ArrayList<>();
@@ -56,7 +56,7 @@ class AuthorControllerTest {
                 .andExpect(content().json("[{'id':'1','name':'Alexander','surname':'Pushkin'}]"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void addAuthor() throws Exception {
         Author author = new Author("2", AUTHOR_NAME_2, AUTHOR_SURNAME_2);
@@ -72,7 +72,7 @@ class AuthorControllerTest {
                 .andExpect(jsonPath("$.surname").value(AUTHOR_SURNAME_2));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void updateAuthor() throws Exception {
         when(authorService.update("1", AUTHOR_NAME_3, AUTHOR_SURNAME_3)).thenReturn(true);
@@ -85,7 +85,7 @@ class AuthorControllerTest {
                 .andExpect(content().string("true"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void deleteAuthor() throws Exception {
         mvc.perform(delete("/authors/{id}", "1"))

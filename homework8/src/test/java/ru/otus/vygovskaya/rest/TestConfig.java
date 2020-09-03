@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Primary;
 import ru.otus.vygovskaya.domain.User;
 import ru.otus.vygovskaya.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +19,9 @@ public class TestConfig {
     @Primary
     public UserRepository mockUserRepository(){
         UserRepository userRepository = mock(UserRepository.class);
-        when(userRepository.findByName("admin")).thenReturn(new User("admin", "password", "ADMIN"));
+        List<String> adminRoles = new ArrayList<>();
+        adminRoles.add("ADMIN");
+        when(userRepository.findByName("admin")).thenReturn(new User("admin", "password", adminRoles));
         return userRepository;
     }
 }

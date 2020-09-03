@@ -35,6 +35,9 @@ function baseFetch(dispatch: Dispatch<any>, props: FetchProps) {
         if (response.status === 401) {
             dispatch({type: SHOW_LOGIN_DIALOG, data: true, fetchProps: props})
         }
+        if (response.status === 403) {
+            dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка авторизации"})
+        }
     }
     let errorHandle = (e: any) => dispatch({type: SET_ERROR_MESSAGE, message: "Ошибка при загрузке данных"})
 

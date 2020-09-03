@@ -42,7 +42,7 @@ class BookControllerTest {
     @MockBean
     private BookService bookService;
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void getAllBooks() throws Exception {
         List<Book> books = new ArrayList<>();
@@ -57,7 +57,7 @@ class BookControllerTest {
                 .andExpect(content().json("[{'id':'1','name':'Ruslan and Ludmila', 'authorId':'1', 'genreId':'1', 'year':1892}]"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void addBook() throws Exception {
         Genre genre = new Genre("2", "story");
@@ -78,7 +78,7 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.year").value(2020));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void updateBook() throws Exception {
         BookDto bookDto = new BookDto("1", BOOK_NAME_3, "1", "1", 1892);
@@ -92,14 +92,14 @@ class BookControllerTest {
                 .andExpect(content().string("true"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void deleteBook() throws Exception {
         mvc.perform(delete("/books/{id}", "1"))
                 .andExpect(status().isOk());
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void getComments() throws Exception {
         Genre genre = new Genre("2", "story");
@@ -114,7 +114,7 @@ class BookControllerTest {
                 .andExpect(content().json("['Great!','Test']"));
     }
 
-    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     void addComment() throws Exception {
         CommentDto comment = new CommentDto();
