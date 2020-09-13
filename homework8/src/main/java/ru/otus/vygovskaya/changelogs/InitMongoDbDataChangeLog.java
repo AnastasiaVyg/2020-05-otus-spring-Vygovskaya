@@ -13,6 +13,9 @@ import ru.otus.vygovskaya.domain.Book;
 import ru.otus.vygovskaya.domain.Genre;
 import ru.otus.vygovskaya.domain.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ChangeLog(order = "001")
 public class InitMongoDbDataChangeLog {
 
@@ -26,8 +29,13 @@ public class InitMongoDbDataChangeLog {
         MongoCollection<Document> users = template.createCollection("user");
         IndexOptions indexOptions = new IndexOptions().unique(true);
         users.createIndex(Indexes.ascending("name"), indexOptions);
-        template.save(new User("admin", "$2a$04$4/2kleogmq5MdMMnGL673.//qM.lAYGUfV/PiRnWpCdKk56NN8XcG", "ADMIN")); //password
-        template.save(new User("ivanov", "$2a$04$DSqmLjUInwwMxtvpV88f1uJ2uYiNSpz3VHSE3fv2o6D3AOOhZ98VO", "USER")); //12345678
+
+        List<String> adminRoles = new ArrayList<>();
+        adminRoles.add("ADMIN");
+        template.save(new User("admin", "$2a$04$4/2kleogmq5MdMMnGL673.//qM.lAYGUfV/PiRnWpCdKk56NN8XcG", adminRoles)); //password
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("USER");
+        template.save(new User("ivanov", "$2a$04$DSqmLjUInwwMxtvpV88f1uJ2uYiNSpz3VHSE3fv2o6D3AOOhZ98VO", userRoles)); //12345678
 
         MongoCollection<Document> genres = template.createCollection("genre");
         genres.createIndex(Indexes.ascending("name"), indexOptions);

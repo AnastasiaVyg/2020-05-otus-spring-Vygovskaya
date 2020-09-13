@@ -3,6 +3,8 @@ package ru.otus.vygovskaya.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document
 public class User {
 
@@ -13,22 +15,22 @@ public class User {
 
     private String password;
 
-    private String role;
+    private List<String> roles;
 
     public User() {
     }
 
-    public User(String name, String password, String role) {
+    public User(String name, String password, List<String> roles) {
         this.name = name;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public User(String id, String name, String password, String role) {
+    public User(String id, String name, String password, List<String> roles) {
         this.id = id;
         this.name = name;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
     }
 
     public String getId() {
@@ -55,11 +57,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public List<String> getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void addRole(String role) {
+        roles.add(role);
     }
 }

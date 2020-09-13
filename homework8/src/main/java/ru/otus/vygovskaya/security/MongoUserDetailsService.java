@@ -11,6 +11,7 @@ import ru.otus.vygovskaya.repository.UserRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class MongoUserDetailsService implements UserDetailsService {
@@ -30,8 +31,7 @@ public class MongoUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("user not found");
         }
 
-        List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole()));
-
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), authorities);
     }
 }
