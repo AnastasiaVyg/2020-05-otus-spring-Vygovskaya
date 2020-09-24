@@ -5,3 +5,17 @@ spring:
       port: 27017
       database: booksLibrary
       changelogs-package: "ru.otus.vygovskaya.changelogs"
+    rest:
+      base-path: /datarest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
