@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2020-06-25--0002-genre
+      author: avygovskaya
+      createTable:
+        tableName: genres
+        columns:
+          - column:
+              name: id
+              type: bigint
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: pk_genre
+          - column:
+              name: name
+              type: varchar(50)
+              constraints:
+                nullable: false
+                unique: true

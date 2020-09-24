@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2020-06-25--0003-book
+      author: avygovskaya
+      changes:
+        - createTable:
+          - tableName: books
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_book
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_author
+                    references: authors(id)
+                    deleteCascade: true
+              - column:
+                  name: genre_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_genre
+                    references: genres(id)
+              - column:
+                  name: year
+                  type: int
+        - addUniqueConstraint:
+            tableName: books
+            constraintName: unique_books
+            columnNames: name, author_id
+
