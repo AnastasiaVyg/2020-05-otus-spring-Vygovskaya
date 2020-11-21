@@ -16,9 +16,9 @@ import {GenreRow} from "../view/GenreTable";
 import {AuthorRow} from "../view/AuthorTable";
 import {BookRow} from "../view/BookTable";
 
-const GENRES_URL = '/genres'
-const AUTHORS_URL = '/authors'
-const BOOKS_URL = '/books'
+const GENRES_URL = '/app/genres'
+const AUTHORS_URL = '/app/authors'
+const BOOKS_URL = '/app/books'
 
 export interface FetchProps {
     url: string
@@ -60,7 +60,7 @@ function baseFetch(dispatch: Dispatch<any>, props: FetchProps) {
 
 export function loginFetch(dispatch: Dispatch<any>, login: String, password: String, props: FetchProps) {
 
-    fetch("/login", {
+    fetch("/app/login", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -81,7 +81,7 @@ export function loginFetch(dispatch: Dispatch<any>, login: String, password: Str
 }
 
 export function logoutFetch(dispatch: Dispatch<any>) {
-    fetch("/logout", {
+    fetch("/app/logout", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
