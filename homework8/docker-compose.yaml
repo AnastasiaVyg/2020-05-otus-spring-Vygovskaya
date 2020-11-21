@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  mymongo:
+    image: mongo:3.4
+    volumes:
+      - ./_data:/data/db
+    ports:
+      - 27017:27017
+    command: ["mongod", "--rest"]
+
+  myapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_PORT=9080
+      - SPRING_DATA_MONGODB_URI=mongodb://mymongo:27017/booksLibrary
+    ports:
+      - 8080:9080
+    links:
+      - mymongo
+
+  reactapp:
+    build:
+      context: ../libraryReact
+      dockerfile: Dockerfile
+    ports:
+      - 3000:8000
+    links:
+      - myapp
