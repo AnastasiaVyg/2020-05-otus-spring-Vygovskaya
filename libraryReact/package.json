@@ -14,11 +14,11 @@
     "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
-    "material-table": "^1.67.1",
+    "material-table": "^1.69.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
     "typescript": "^3.7.5"
